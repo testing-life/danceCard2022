@@ -30,9 +30,6 @@ export const LoginComponent: FC = () => {
     const res = await doEmailSignIn(email, password).catch(e => setSigninError(e.message));
     console.log('res', res, error);
   };
-  // const getGeoPoint: (latitude: number, longitude: number) => firebase.firestore.GeoPoint = (latitude, longitude) => {
-  //   return firebase.getGeoPoint(latitude, longitude);
-  // };
 
   // const submitHandler: OnSubmit<any> = ({ email, password }, event): void => {
   //   firebase
