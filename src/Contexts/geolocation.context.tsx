@@ -1,5 +1,10 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import { LatLngLiteral } from 'leaflet';
+import * as geofire from 'geofire-common';
+
+interface HashedLocation extends LatLngLiteral {
+  hash: string;
+}
 
 type GeolocationConsumer = {
   location: LatLngLiteral;
@@ -13,17 +18,15 @@ type Props = {
 const GeolocationContext = createContext<GeolocationConsumer>({} as GeolocationConsumer);
 
 export const GeolocationProvider = ({ ...props }: Props) => {
-  const [location, setLocation] = useState<LatLngLiteral>({} as LatLngLiteral);
-  const [locationError, setLocationError] = useState<any>({} as any);
-  let mounted = true;
+  const [location, setLocation] = useState<HashedLocation>({} as HashedLocation);
+  const [locationError, setLocationError] = useState({});
 
   const onChange = ({ coords }: any) => {
-    if (mounted) {
-      setLocation({
-        lat: coords.latitude,
-        lng: coords.longitude,
-      });
-    }
+    setLocation({
+      lat: coords.latitude,
+      lng: coords.longitude,
+      hash: geofire.geohashForLocation([coords.latitude, coords.longitude]),
+    });
   };
 
   const onError = (error: any) => {
@@ -31,14 +34,13 @@ export const GeolocationProvider = ({ ...props }: Props) => {
   };
 
   useEffect(() => {
-    let watchId: any = undefined;
+    // let watchId: any = undefined;
     navigator.geolocation.getCurrentPosition(onChange, onError);
-    watchId = navigator.geolocation.watchPosition(onChange, onError);
+    // watchId = navigator.geolocation.watchPosition(onChange, onError);
 
-    return () => {
-      mounted = false;
-      navigator.geolocation.clearWatch(watchId);
-    };
+    // return () => {
+    //   navigator.geolocation.clearWatch(watchId);
+    // };
   }, []);
 
   return <GeolocationContext.Provider value={{ location, locationError }} {...props} />;

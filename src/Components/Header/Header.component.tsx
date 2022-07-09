@@ -6,7 +6,7 @@ const HeaderComponent: FC = () => {
   return (
     <>
       <NotificationComponent />
-      <NavigationComponent />
+      {/* <NavigationComponent /> */}
     </>
   );
 };

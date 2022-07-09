@@ -1,4 +1,7 @@
 import React, { FunctionComponent, useEffect, useState, ChangeEvent } from 'react';
+import * as geofire from 'geofire-common';
+import { db, query, collection } from '../../Firebase/firebase';
+
 // import { LeafletMap } from '../Map/Map.component';
 // import { useGeo } from '../../Contexts/geolocation.context';
 // import Firebase from '../../Firebase/firebase';
@@ -9,34 +12,53 @@ import React, { FunctionComponent, useEffect, useState, ChangeEvent } from 'reac
 // import { useProfile } from '../../Contexts/profile.context';
 // import { Profile } from '../../Models/profile.models';
 import { MapContainer, TileLayer, useMap, Marker, Popup } from 'react-leaflet';
+import { useGeo } from '../../Contexts/geolocation.context';
+import { endAt, getDoc, getDocs, orderBy, startAt } from 'firebase/firestore';
 
 export const HomeComponent: FunctionComponent<any> = () => {
-  // const { location, locationError } = useGeo();
+  const { location, locationError } = useGeo();
   // const { user } = useUser();
   // const { profile, setProfile } = useProfile();
   // const [error, setError] = useState<string>();
-  // const [localUsers, setLocalUsers] = useState<GeoFirestoreTypes.QueryDocumentSnapshot[]>([]);
+  const [localUsers, setLocalUsers] = useState([]);
   // const [radius, setRadius] = useState<number>(2);
-  // const fetchLocalUsers = (place: LatLngLiteral, radius: number) => {
-  //   const geoPoint = place && firebase.getGeoPoint(place.lat, place.lng);
-  //   // const geoPoint = place && firebase.getGeoPoint(DEV_LOCATION.lat, DEV_LOCATION.lng);
-  //   const query: GeoQuery = firebase.getUsers().near({ center: geoPoint, radius });
-  //   query.onSnapshot((res: GeoQuerySnapshot) => {
-  //     const usersWithoutCurrentUser = res.docs.filter(u => u.id !== user.uid).filter(user => user.data().active);
 
-  //     setLocalUsers(usersWithoutCurrentUser);
-  //   });
-  // };
+  const fetchLocalUsers = async (location: any) => {
+    const radiusInM = 10 * 1000;
+    const bounds = geofire.geohashQueryBounds([location.lat, location.lng], radiusInM);
+    const promises = [];
+    for (const b of bounds) {
+      const q = query(collection(db, 'users'), orderBy('hash'), startAt(b[0]), endAt(b[1]));
+      promises.push(getDocs(q));
+    }
+    const matchingDocs = [];
+    const snapshots = await Promise.all(promises);
+    for (const snap of snapshots) {
+      console.log('snap.docs[0].data()', snap.docs[0].data());
+      for (const doc of snap.docs) {
+        console.log('doc', doc);
+        const lat = doc.get('lat');
+        const lng = doc.get('lng');
+        const distanceInKm = geofire.distanceBetween([lat, lng], [location.lat, location.lng]);
+        const distanceInM = distanceInKm * 1000;
+        if (distanceInM <= radiusInM) {
+          matchingDocs.push(doc);
+        }
+      }
+    }
+    console.log('matchingDocs', matchingDocs[0].data(), matchingDocs[1].data());
+    // setLocalUsers(usersWithoutCurrentUser);
+  };
 
   // const radiusSliderHandler = (e: ChangeEvent<HTMLInputElement>) => {
   //   setRadius(+e.target.value);
   // };
 
-  // useEffect(() => {
-  //   if (Object.keys(location).length) {
-  //     fetchLocalUsers(location, radius);
-  //   }
-  // }, [location, radius, locationError]);
+  useEffect(() => {
+    if (Object.keys(location).length) {
+      fetchLocalUsers(location);
+    }
+  }, [location, locationError]);
 
   // const toggleVisiblity = () => {
   //   const newProfile: Profile = { ...profile, active: !profile.active };
@@ -51,7 +73,7 @@ export const HomeComponent: FunctionComponent<any> = () => {
   //       (error: Error) => setError(error.message),
   //     );
   // };
-  function LocationMarker() {
+  const LocationMarker = () => {
     const [position, setPosition] = useState<any>(null);
     const [bbox, setBbox] = useState<any>([]);
 
@@ -59,7 +81,7 @@ export const HomeComponent: FunctionComponent<any> = () => {
 
     useEffect(() => {
       map.locate({ setView: true, watch: true, enableHighAccuracy: true }).on('locationfound', function (e) {
-        console.log('e.latlng', e.latlng, e);
+        // console.log('e.latlng', e.latlng, e);
         setPosition(e.latlng);
         map.flyTo(e.latlng, map.getZoom());
       });
@@ -77,9 +99,10 @@ export const HomeComponent: FunctionComponent<any> = () => {
         </Popup>
       </Marker>
     );
-  }
+  };
   return (
-    <div className="container">
+    <>
+      {console.log('location', location)}
       <p>home comp</p>
       <MapContainer
         style={{ width: '500px', height: '500px' }}
@@ -120,6 +143,6 @@ export const HomeComponent: FunctionComponent<any> = () => {
       ) : (
         <p>We do need geolocation to show the map. Please enable it in your browser and reload the page.</p>
       )} */}
-    </div>
+    </>
   );
 };

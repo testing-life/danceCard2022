@@ -36,6 +36,8 @@ const doSignOut = async () => await signOut(auth);
 export {
   auth,
   db,
+  query,
+  collection,
   doEmailSignIn,
   doPasswordReset,
   doEmailRegistration,
@@ -44,43 +46,9 @@ export {
   createUserWithEmailAndPassword,
 };
 
-// class Firebase {
-//   private auth;
-//   private firestore;
-//   private firestoreRef: any;
-//   private geofirestore: GeoFirestore;
-//   public fieldValue: any;
-
-//   constructor() {
-//     app.initializeApp(firebaseConfig);
-//     console.log('app', app);
-//     this.auth = app.auth();
-//     this.firestore = app.firestore();
-//     this.firestore.settings({ experimentalForceLongPolling: true });
-//     this.firestoreRef = app.firestore;
-//     this.geofirestore = new GeoFirestore(this.firestore);
-//     this.fieldValue = app.firestore.FieldValue;
-//   }
-
-//   doAnonymousSignIn = () => this.auth.signInAnonymously();
-//   doEmailRegistration = (email: string, password: string) => this.auth.createUserWithEmailAndPassword(email, password);
-//   doSignOut = () => this.auth.signOut();
-//   onAuthStateChanged = (user: any) => this.auth.onAuthStateChanged(user);
-//   doEmailSignIn = (email: string, password: string) => this.auth.signInWithEmailAndPassword(email, password);
 //   getCurrentUser = () => this.auth.currentUser;
 //   getUsers = (): GeoCollectionReference => this.geofirestore.collection(Collections.Users);
 //   getChats = () => this.firestore.collection(Collections.Chats);
 //   getGeoPoint = (latitude: number, longitude: number) => new this.firestoreRef.GeoPoint(latitude, longitude);
 // }
 // export default Firebase;
-
-// // export const FirebaseContext = React.createContext<Firebase|null>(null)
-
-// type FirebaseConsumer = {
-//   firebase: Firebase;
-// };
-// type Props = {
-//   firebase: Firebase | undefined;
-// };
-
-// export const FirebaseContext = React.createContext<any>(undefined);
