@@ -1,6 +1,5 @@
 import React, { FunctionComponent, useEffect, useState, ChangeEvent } from 'react';
-import * as geofire from 'geofire-common';
-import { db, query, collection } from '../../Firebase/firebase';
+import { getUsersInRadius } from '../../Firebase/firebase';
 
 // import { LeafletMap } from '../Map/Map.component';
 // import { useGeo } from '../../Contexts/geolocation.context';
@@ -13,41 +12,19 @@ import { db, query, collection } from '../../Firebase/firebase';
 // import { Profile } from '../../Models/profile.models';
 import { MapContainer, TileLayer, useMap, Marker, Popup } from 'react-leaflet';
 import { useGeo } from '../../Contexts/geolocation.context';
-import { endAt, getDoc, getDocs, orderBy, startAt } from 'firebase/firestore';
+import { DocumentData, QueryDocumentSnapshot } from 'firebase/firestore';
 
 export const HomeComponent: FunctionComponent<any> = () => {
   const { location, locationError } = useGeo();
   // const { user } = useUser();
   // const { profile, setProfile } = useProfile();
   // const [error, setError] = useState<string>();
-  const [localUsers, setLocalUsers] = useState([]);
+  const [localUsers, setLocalUsers] = useState<QueryDocumentSnapshot<DocumentData>[]>();
   // const [radius, setRadius] = useState<number>(2);
 
   const fetchLocalUsers = async (location: any) => {
-    const radiusInM = 10 * 1000;
-    const bounds = geofire.geohashQueryBounds([location.lat, location.lng], radiusInM);
-    const promises = [];
-    for (const b of bounds) {
-      const q = query(collection(db, 'users'), orderBy('hash'), startAt(b[0]), endAt(b[1]));
-      promises.push(getDocs(q));
-    }
-    const matchingDocs = [];
-    const snapshots = await Promise.all(promises);
-    for (const snap of snapshots) {
-      console.log('snap.docs[0].data()', snap.docs[0].data());
-      for (const doc of snap.docs) {
-        console.log('doc', doc);
-        const lat = doc.get('lat');
-        const lng = doc.get('lng');
-        const distanceInKm = geofire.distanceBetween([lat, lng], [location.lat, location.lng]);
-        const distanceInM = distanceInKm * 1000;
-        if (distanceInM <= radiusInM) {
-          matchingDocs.push(doc);
-        }
-      }
-    }
-    console.log('matchingDocs', matchingDocs[0].data(), matchingDocs[1].data());
-    // setLocalUsers(usersWithoutCurrentUser);
+    const matches = await getUsersInRadius([location.lat, location.lng]);
+    setLocalUsers(matches);
   };
 
   // const radiusSliderHandler = (e: ChangeEvent<HTMLInputElement>) => {

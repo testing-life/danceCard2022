@@ -6,9 +6,21 @@ import {
   sendPasswordResetEmail,
   signOut,
 } from 'firebase/auth';
-import { getFirestore, query, getDocs, collection, where, addDoc } from 'firebase/firestore';
-import { GeoFirestore, GeoCollectionReference } from 'geofirestore';
+import {
+  getFirestore,
+  query,
+  getDocs,
+  collection,
+  where,
+  addDoc,
+  orderBy,
+  endAt,
+  startAt,
+  QueryDocumentSnapshot,
+  QuerySnapshot,
+} from 'firebase/firestore';
 import { Collections } from '../Constants/collections';
+import * as geofire from 'geofire-common';
 
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_API_KEY,
@@ -33,6 +45,35 @@ const doPasswordReset = async (email: string) => await sendPasswordResetEmail(au
 
 const doSignOut = async () => await signOut(auth);
 
+const getUsersInRadius = async (
+  location: [lat: number, lng: number],
+  radiusInM: number = 5000,
+): Promise<QueryDocumentSnapshot[]> => {
+  const bounds: string[][] = geofire.geohashQueryBounds(location, radiusInM);
+  const promises: Promise<QuerySnapshot>[] = [];
+  const matchingDocs: QueryDocumentSnapshot[] = [];
+  for (const b of bounds) {
+    const q = query(collection(db, 'users'), orderBy('hash'), startAt(b[0]), endAt(b[1]));
+    promises.push(getDocs(q));
+  }
+  const snapshots = await Promise.all(promises).catch((e: Error) => console.error(e));
+  if (snapshots) {
+    for (const snap of snapshots) {
+      // console.log('snap.docs[0].data()', snap.docs[0].data());
+      for (const doc of snap.docs) {
+        const lat = doc.get('lat');
+        const lng = doc.get('lng');
+        const distanceInKm = geofire.distanceBetween([lat, lng], location);
+        const distanceInM = distanceInKm * 1000;
+        if (distanceInM <= radiusInM) {
+          matchingDocs.push(doc);
+        }
+      }
+    }
+  }
+  return matchingDocs;
+};
+
 export {
   auth,
   db,
@@ -44,6 +85,7 @@ export {
   doSignOut,
   addDoc,
   createUserWithEmailAndPassword,
+  getUsersInRadius,
 };
 
 //   getCurrentUser = () => this.auth.currentUser;
