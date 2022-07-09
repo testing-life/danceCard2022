@@ -21,6 +21,7 @@ import {
 } from 'firebase/firestore';
 import { Collections } from '../Constants/collections';
 import * as geofire from 'geofire-common';
+import { RADIUS_IN_M } from '../Constants/locatingParams';
 
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_API_KEY,
@@ -47,13 +48,13 @@ const doSignOut = async () => await signOut(auth);
 
 const getUsersInRadius = async (
   location: [lat: number, lng: number],
-  radiusInM: number = 5000,
+  radiusInM: number = RADIUS_IN_M,
 ): Promise<QueryDocumentSnapshot[]> => {
   const bounds: string[][] = geofire.geohashQueryBounds(location, radiusInM);
   const promises: Promise<QuerySnapshot>[] = [];
   const matchingDocs: QueryDocumentSnapshot[] = [];
   for (const b of bounds) {
-    const q = query(collection(db, 'users'), orderBy('hash'), startAt(b[0]), endAt(b[1]));
+    const q = query(collection(db, Collections.Users), orderBy('hash'), startAt(b[0]), endAt(b[1]));
     promises.push(getDocs(q));
   }
   const snapshots = await Promise.all(promises).catch((e: Error) => console.error(e));

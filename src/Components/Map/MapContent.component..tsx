@@ -10,7 +10,7 @@ import { DocumentData, QueryDocumentSnapshot } from 'firebase/firestore';
 import { auth } from '../../Firebase/firebase';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { useGeo } from '../../Contexts/geolocation.context';
-import { MapContent } from './MapContent.component.';
+import { RADIUS_IN_M } from '../../Constants/locatingParams';
 
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 
@@ -22,22 +22,48 @@ L.Icon.Default.mergeOptions({
 
 type Props = {
   localUsers: QueryDocumentSnapshot<DocumentData>[];
+  radius?: number;
   userActive?: boolean;
 };
 
-export const LeafletMap: FC<Props> = ({ localUsers }) => {
+export const MapContent: FC<Props> = ({ localUsers }) => {
+  const [user] = useAuthState(auth);
+  const map = useMap();
+  const [position, setPosition] = useState<any>(null);
+
+  useEffect(() => {
+    map.locate({ setView: true, watch: true, enableHighAccuracy: true }).on('locationfound', function (e) {
+      setPosition(e.latlng);
+      map.flyTo(e.latlng, map.getZoom());
+    });
+  }, [map]);
+
+  const UserLocationMarker = () => {
+    return position === null ? null : (
+      <Marker position={position}>
+        <Circle center={position} pathOptions={{ fillColor: 'blue' }} radius={RADIUS_IN_M} />
+        <Popup>
+          You are here. <br />
+        </Popup>
+      </Marker>
+    );
+  };
+
   return (
-    <MapContainer
-      style={{ width: '500px', height: '500px' }}
-      center={[49.1951, 16.6068]}
-      zoom={13}
-      scrollWheelZoom={false}
-    >
+    <>
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
-      <MapContent localUsers={localUsers} />
-    </MapContainer>
+      <UserLocationMarker />
+      {localUsers?.map(localUser => {
+        const otherUser = localUser.data();
+        return user?.uid !== otherUser.uid ? (
+          <Marker key={otherUser.uid} position={[otherUser.lat, otherUser.lng]}>
+            <Popup>You are here. {otherUser.username}</Popup>
+          </Marker>
+        ) : null;
+      })}
+    </>
   );
 };
