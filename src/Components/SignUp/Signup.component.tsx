@@ -1,4 +1,4 @@
-import React, { Fragment, FunctionComponent, useState, useEffect, FC } from 'react';
+import React, { useState, FC } from 'react';
 import { addDoc, auth, createUserWithEmailAndPassword, db } from '../../Firebase/firebase';
 import * as ROUTES from '../../Constants/routes';
 import { useForm } from 'react-hook-form';
@@ -7,6 +7,7 @@ import { Profile } from '../../Models/profile.models';
 import ErrorMessages from '../../Constants/errors';
 import { collection } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
+import { Collections } from '../../Constants/collections';
 
 export const SignUpComponent: FC = () => {
   const {
@@ -20,16 +21,16 @@ export const SignUpComponent: FC = () => {
 
   const submitHandler = async (data: any) => {
     const { email, password, username } = data;
-    console.log('data', email, password, username);
     const res: any = await createUserWithEmailAndPassword(auth, email, password).catch((error: Error) =>
       setError(error.message),
     );
     const user = res.user;
-    const updateRes = await addDoc(collection(db, 'users'), {
+    const updateRes = await addDoc(collection(db, Collections.Users), {
       uid: user.uid,
       username,
       email,
       ...location,
+      ...Profile.create(),
     }).catch((error: Error) => setError(error.message));
     if (updateRes) {
       navigate(ROUTES.LOG_IN);
@@ -38,7 +39,6 @@ export const SignUpComponent: FC = () => {
 
   return (
     <>
-      {console.log('location', location)}
       {
         Object.entries(location).length !== 0 ? (
           <form onSubmit={handleSubmit(submitHandler)}>

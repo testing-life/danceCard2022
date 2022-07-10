@@ -18,6 +18,8 @@ import {
   startAt,
   QueryDocumentSnapshot,
   QuerySnapshot,
+  updateDoc,
+  doc,
 } from 'firebase/firestore';
 import { Collections } from '../Constants/collections';
 import * as geofire from 'geofire-common';
@@ -85,6 +87,10 @@ export {
   doEmailRegistration,
   doSignOut,
   addDoc,
+  updateDoc,
+  getDocs,
+  where,
+  doc,
   createUserWithEmailAndPassword,
   getUsersInRadius,
 };

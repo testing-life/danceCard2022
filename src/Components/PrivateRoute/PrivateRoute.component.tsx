@@ -6,10 +6,12 @@ import * as ROUTES from '../../Constants/routes';
 import { auth } from '../../Firebase/firebase';
 
 const PrivateRoute: FunctionComponent<any> = ({ children }) => {
-  const [user] = useAuthState(auth);
+  const [user, loading] = useAuthState(auth);
   const location = useLocation();
-  if (!user) {
-    return <Navigate to={ROUTES.LOG_IN} state={{ from: location }} replace />;
+  if (!loading) {
+    if (!user) {
+      return <Navigate to={ROUTES.LOG_IN} state={{ from: location }} replace />;
+    }
   }
   return children;
 };
