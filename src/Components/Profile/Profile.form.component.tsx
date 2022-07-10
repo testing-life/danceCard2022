@@ -10,16 +10,9 @@ import './Profile.form.component.css';
 const ProfileFormComponent: FunctionComponent = () => {
   const [profile, setProfile] = useState<any>();
   const [formData, setFormData] = useState({});
+  const [updating, setUpdating] = useState(false);
   const [user, loading, authError] = useAuthState(auth);
-  const [updateProfile, updating, updateProfileError] = useUpdateProfile(auth);
   const [localError, setLocalError] = useState();
-
-  // const {
-  //   register,
-  //   handleSubmit,
-  //   setValue,
-  //   formState: { errors },
-  // } = useForm();
 
   useEffect(() => {
     const setLocalProfile = async () => {
@@ -49,10 +42,14 @@ const ProfileFormComponent: FunctionComponent = () => {
 
   const onSubmit = async (e: any) => {
     e.preventDefault();
+    setUpdating(true);
     const userRef = doc(db, Collections.Users, profile.docId);
-
-    await updateDoc(userRef, formData).catch(e => console.error(e.message));
-    getUserProfile();
+    if (userRef) {
+      await updateDoc(userRef, formData)
+        .catch(e => setLocalError(e.message))
+        .finally(() => setUpdating(false));
+      getUserProfile();
+    }
   };
 
   return (
@@ -122,9 +119,8 @@ const ProfileFormComponent: FunctionComponent = () => {
           <button type="submit">Update</button>
         </form>
       )}
-      {/* {!!Object.keys(errors).length && console.log(errors, ' errors in form comp')} */}
       {localError && <p>{localError}</p>}
-      {updateProfileError && <p>{updateProfileError.message}</p>}
+      {updating && <p>...updating</p>}
     </>
   );
 };
