@@ -43,7 +43,7 @@ const ProfileFormComponent: FunctionComponent = () => {
     const value = e.target.checked;
     const danceObj = profile.dances[name];
     danceObj[position] = value;
-    const dances = { ...profile.dances, [`name`]: danceObj };
+    const dances = { ...profile.dances, [name]: danceObj };
     setFormData({ ...formData, dances });
   };
 
@@ -51,8 +51,8 @@ const ProfileFormComponent: FunctionComponent = () => {
     e.preventDefault();
     const userRef = doc(db, Collections.Users, profile.docId);
 
-    const res = await updateDoc(userRef, formData);
-    console.log('res', res);
+    await updateDoc(userRef, formData).catch(e => console.error(e.message));
+    getUserProfile();
   };
 
   return (
