@@ -5,8 +5,8 @@ import NotificationComponent from './Notifications.component';
 const HeaderComponent: FC = () => {
   return (
     <>
-      <NotificationComponent />
-      {/* <NavigationComponent /> */}
+      {/* <NotificationComponent /> */}
+      <NavigationComponent />
     </>
   );
 };

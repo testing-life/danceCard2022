@@ -11,12 +11,10 @@ import { LoginPage } from './Pages/Login';
 import { SignUpPage } from './Pages/Signup';
 import { LandingPage } from './Pages/Landing';
 import PrivateRoute from './Components/PrivateRoute/PrivateRoute.component';
-import { doSignOut } from './Firebase/firebase';
 
 const App = () => {
   return (
     <>
-      <button onClick={() => doSignOut()}>signout</button>
       <BrowserRouter>
         <Routes>
           <Route path="/">

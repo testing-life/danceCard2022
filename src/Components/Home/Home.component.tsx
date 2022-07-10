@@ -13,11 +13,12 @@ import { getUsersInRadius } from '../../Firebase/firebase';
 import { useGeo } from '../../Contexts/geolocation.context';
 import { DocumentData, QueryDocumentSnapshot } from 'firebase/firestore';
 import { LeafletMap } from '../Map/Map.component';
+import { useProfile } from '../../Contexts/profile.context';
 
 export const HomeComponent: FunctionComponent<any> = () => {
   const { location, locationError } = useGeo();
   // const { user } = useUser();
-  // const { profile, setProfile } = useProfile();
+  const { profile } = useProfile();
   // const [error, setError] = useState<string>();
   const [localUsers, setLocalUsers] = useState<QueryDocumentSnapshot<DocumentData>[]>([]);
   // const [radius, setRadius] = useState<number>(2);
@@ -53,6 +54,7 @@ export const HomeComponent: FunctionComponent<any> = () => {
 
   return (
     <>
+      {console.log('profile', profile)}
       <LeafletMap localUsers={localUsers} />
       {/* {error && <p>{error}</p>}
       <div className="row">

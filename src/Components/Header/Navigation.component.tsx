@@ -1,12 +1,11 @@
 import React, { FunctionComponent, useRef } from 'react';
-// import Firebase from '../../Firebase/firebase';
-// import { navigate, Link } from '@reach/router';
-// import * as ROUTES from '../../Constants/routes';
-// import { useUser } from '../../Contexts/user.context';
-// import './Navigation.component.css';
-// import { useProfile } from '../../Contexts/profile.context';
+import * as ROUTES from '../../Constants/routes';
+import { doSignOut } from '../../Firebase/firebase';
+import './Navigation.component.css';
+import { Link, useNavigate } from 'react-router-dom';
 
 const NavigationComponent: FunctionComponent = () => {
+  const navigate = useNavigate();
   // const { clearUser } = useUser();
   // const { profile } = useProfile();
   // const isLoggedIn = firebase.getCurrentUser();
@@ -23,30 +22,29 @@ const NavigationComponent: FunctionComponent = () => {
 
   return (
     <div>
-      {/* <nav>
+      <nav>
         <Link className="button" to={ROUTES.HOME}>
           Home
         </Link>
         <Link className="button" to={ROUTES.PROFILE}>
           Profile
         </Link>
-        <Link
+        {/* <Link
           className={`button ${profile.active ? '' : 'disabled'}`}
           to={profile.active ? ROUTES.CHATS : './'}
         >
           Chats
-        </Link>
+        </Link> */}
         <button
           className="button button-outline"
           onClick={() => {
-            firebase.doSignOut();
+            doSignOut();
             localStorage.clear();
-            navigate(ROUTES.LOG_IN);
           }}
         >
           Logout
         </button>
-      </nav> */}
+      </nav>
     </div>
   );
 };

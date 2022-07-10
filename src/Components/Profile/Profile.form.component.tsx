@@ -1,35 +1,11 @@
-import React, { FunctionComponent, useState, useEffect } from 'react';
-import { useAuthState } from 'react-firebase-hooks/auth';
-import { Collections } from '../../Constants/collections';
-import { auth, query, db, collection, getDocs, updateDoc, where, doc } from '../../Firebase/firebase';
-import { Profile } from '../../Models/profile.models';
+import React, { useState, FC } from 'react';
+import { useProfile } from '../../Contexts/profile.context';
 import './Profile.form.component.css';
 
-const ProfileFormComponent: FunctionComponent = () => {
-  const [profile, setProfile] = useState<any>();
+const ProfileFormComponent: FC = () => {
   const [formData, setFormData] = useState({});
   const [updating, setUpdating] = useState(false);
-  const [user, loading, authError] = useAuthState(auth);
-  const [localError, setLocalError] = useState();
-
-  useEffect(() => {
-    const setLocalProfile = async () => {
-      const res = await getUserProfile();
-      if (res) {
-        setProfile(res);
-        setFormData(res);
-      }
-    };
-    if (!loading && user) {
-      setLocalProfile();
-    }
-  }, [loading, user]);
-
-  const getUserProfile = async () => {
-    const q = query(collection(db, Collections.Users), where('uid', '==', user?.uid));
-    const doc = await getDocs(q).catch(e => setLocalError(e.message));
-    return doc ? { ...doc.docs[0].data(), docId: doc?.docs[0].id } : null;
-  };
+  const { profile, updateProfile, profileError } = useProfile();
 
   const updateDanceObj = (e: any, position: string) => {
     const name = e.target.name;
@@ -42,14 +18,7 @@ const ProfileFormComponent: FunctionComponent = () => {
 
   const onSubmit = async (e: any) => {
     e.preventDefault();
-    setUpdating(true);
-    const userRef = doc(db, Collections.Users, profile.docId);
-    if (userRef) {
-      await updateDoc(userRef, formData)
-        .catch(e => setLocalError(e.message))
-        .finally(() => setUpdating(false));
-      getUserProfile();
-    }
+    updateProfile(formData);
   };
 
   return (
@@ -119,7 +88,7 @@ const ProfileFormComponent: FunctionComponent = () => {
           <button type="submit">Update</button>
         </form>
       )}
-      {localError && <p>{localError}</p>}
+      {profileError && <p>{profileError}</p>}
       {updating && <p>...updating</p>}
     </>
   );
