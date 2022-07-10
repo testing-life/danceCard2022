@@ -1,8 +1,6 @@
-import React, { FunctionComponent, Fragment, useState, useEffect } from 'react';
-import { useAuthState, useUpdateProfile } from 'react-firebase-hooks/auth';
-import { useForm } from 'react-hook-form';
+import React, { FunctionComponent, useState, useEffect } from 'react';
+import { useAuthState } from 'react-firebase-hooks/auth';
 import { Collections } from '../../Constants/collections';
-import * as ROUTES from '../../Constants/routes';
 import { auth, query, db, collection, getDocs, updateDoc, where, doc } from '../../Firebase/firebase';
 import { Profile } from '../../Models/profile.models';
 import './Profile.form.component.css';
@@ -16,14 +14,16 @@ const ProfileFormComponent: FunctionComponent = () => {
 
   useEffect(() => {
     const setLocalProfile = async () => {
-      const res = !loading && (await getUserProfile());
+      const res = await getUserProfile();
       if (res) {
         setProfile(res);
         setFormData(res);
       }
     };
-    setLocalProfile();
-  }, [loading]);
+    if (!loading && user) {
+      setLocalProfile();
+    }
+  }, [loading, user]);
 
   const getUserProfile = async () => {
     const q = query(collection(db, Collections.Users), where('uid', '==', user?.uid));
