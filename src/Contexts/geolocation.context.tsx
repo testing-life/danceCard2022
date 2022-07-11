@@ -9,6 +9,7 @@ interface HashedLocation extends LatLngLiteral {
 type GeolocationConsumer = {
   location: LatLngLiteral;
   locationError: any;
+  updateLocation: (coords: any) => void;
 };
 
 type Props = {
@@ -21,29 +22,32 @@ export const GeolocationProvider = ({ ...props }: Props) => {
   const [location, setLocation] = useState<HashedLocation>({} as HashedLocation);
   const [locationError, setLocationError] = useState({});
 
-  const onChange = ({ coords }: any) => {
-    setLocation({
-      lat: coords.latitude,
-      lng: coords.longitude,
-      hash: geofire.geohashForLocation([coords.latitude, coords.longitude]),
-    });
+  const onChange = (coords: any) => {
+    if (coords) {
+      setLocation({
+        lat: coords.lat,
+        lng: coords.lng,
+        hash: geofire.geohashForLocation([coords.lat, coords.lng]),
+      });
+    }
   };
 
   const onError = (error: any) => {
     setLocationError(error);
   };
 
+  const updateLocation = (coords: any) => onChange(coords);
+
   useEffect(() => {
     // let watchId: any = undefined;
-    navigator.geolocation.getCurrentPosition(onChange, onError);
+    // navigator.geolocation.getCurrentPosition(onChange, onError);
     // watchId = navigator.geolocation.watchPosition(onChange, onError);
-
     // return () => {
     //   navigator.geolocation.clearWatch(watchId);
     // };
   }, []);
 
-  return <GeolocationContext.Provider value={{ location, locationError }} {...props} />;
+  return <GeolocationContext.Provider value={{ location, locationError, updateLocation }} {...props} />;
 };
 
 const { Consumer: GeolocationConsumer } = GeolocationContext;

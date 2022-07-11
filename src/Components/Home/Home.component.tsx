@@ -54,7 +54,6 @@ export const HomeComponent: FunctionComponent<any> = () => {
 
   return (
     <>
-      {console.log('profile', profile)}
       <LeafletMap localUsers={localUsers} />
       {/* {error && <p>{error}</p>}
       <div className="row">

@@ -30,10 +30,18 @@ export const MapContent: FC<Props> = ({ localUsers }) => {
   const [user] = useAuthState(auth);
   const map = useMap();
   const [position, setPosition] = useState<any>(null);
+  const { updateLocation } = useGeo();
 
   useEffect(() => {
     map.locate({ setView: true, watch: true, enableHighAccuracy: true }).on('locationfound', function (e) {
-      setPosition(e.latlng);
+      setPosition((prevState: any) => {
+        if (prevState?.lng !== e.latlng.lng || prevState?.lat !== e.latlng.lat) {
+          // update profile
+          console.log('prevState', prevState);
+        }
+        return e.latlng;
+      });
+      updateLocation(e.latlng);
       map.flyTo(e.latlng, map.getZoom());
     });
   }, [map]);
