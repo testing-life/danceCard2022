@@ -22,10 +22,11 @@ L.Icon.Default.mergeOptions({
 
 type Props = {
   localUsers: QueryDocumentSnapshot<DocumentData>[];
+  radius: number;
   userActive?: boolean;
 };
 
-export const LeafletMap: FC<Props> = ({ localUsers }) => {
+export const LeafletMap: FC<Props> = ({ localUsers, radius }) => {
   return (
     <MapContainer
       style={{ width: '500px', height: '500px' }}
@@ -37,7 +38,7 @@ export const LeafletMap: FC<Props> = ({ localUsers }) => {
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
-      <MapContent localUsers={localUsers} />
+      <MapContent localUsers={localUsers} radius={radius} />
     </MapContainer>
   );
 };

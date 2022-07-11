@@ -23,11 +23,11 @@ L.Icon.Default.mergeOptions({
 
 type Props = {
   localUsers: QueryDocumentSnapshot<DocumentData>[];
-  radius?: number;
+  radius: number;
   userActive?: boolean;
 };
 
-export const MapContent: FC<Props> = ({ localUsers }) => {
+export const MapContent: FC<Props> = ({ localUsers, radius }) => {
   const [user] = useAuthState(auth);
   const map = useMap();
   const { profile, updateLocationInProfile } = useProfile();
@@ -55,7 +55,7 @@ export const MapContent: FC<Props> = ({ localUsers }) => {
   const UserLocationMarker = () => {
     return position === undefined ? null : (
       <Marker position={position}>
-        <Circle center={position} pathOptions={{ fillColor: 'blue' }} radius={RADIUS_IN_M} />
+        <Circle center={position} pathOptions={{ fillColor: 'blue' }} radius={radius} />
         <Popup>
           You are here. <br />
         </Popup>

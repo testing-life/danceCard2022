@@ -14,6 +14,7 @@ import { useGeo } from '../../Contexts/geolocation.context';
 import { DocumentData, QueryDocumentSnapshot } from 'firebase/firestore';
 import { LeafletMap } from '../Map/Map.component';
 import { useProfile } from '../../Contexts/profile.context';
+import { RADIUS_IN_M } from '../../Constants/locatingParams';
 
 export const HomeComponent: FunctionComponent<any> = () => {
   const { location, locationError } = useGeo();
@@ -21,22 +22,22 @@ export const HomeComponent: FunctionComponent<any> = () => {
   const { profile } = useProfile();
   // const [error, setError] = useState<string>();
   const [localUsers, setLocalUsers] = useState<QueryDocumentSnapshot<DocumentData>[]>([]);
-  // const [radius, setRadius] = useState<number>(2);
+  const [radius, setRadius] = useState(RADIUS_IN_M);
 
   const fetchLocalUsers = async (location: any) => {
-    const matches = await getUsersInRadius([location.lat, location.lng]);
+    const matches = await getUsersInRadius([location.lat, location.lng], radius);
     setLocalUsers(matches);
   };
 
-  // const radiusSliderHandler = (e: ChangeEvent<HTMLInputElement>) => {
-  //   setRadius(+e.target.value);
-  // };
+  const radiusSliderHandler = (e: ChangeEvent<HTMLInputElement>) => {
+    setRadius(parseInt(e.target.value));
+  };
 
   useEffect(() => {
     if (Object.keys(location).length) {
       fetchLocalUsers(location);
     }
-  }, [location, locationError]);
+  }, [location, locationError, radius]);
 
   // const toggleVisiblity = () => {
   //   const newProfile: Profile = { ...profile, active: !profile.active };
@@ -54,7 +55,19 @@ export const HomeComponent: FunctionComponent<any> = () => {
 
   return (
     <>
-      <LeafletMap localUsers={localUsers} />
+      <div className="row">
+        <span>Search radius: {radius / 1000}km</span>
+        <input
+          type="range"
+          name="radius"
+          value={radius}
+          min="1"
+          step="100"
+          max="20000"
+          onChange={radiusSliderHandler}
+        />
+      </div>
+      <LeafletMap localUsers={localUsers} radius={radius} />
       {/* {error && <p>{error}</p>}
       <div className="row">
         <p className="column">
