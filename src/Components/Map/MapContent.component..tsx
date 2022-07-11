@@ -4,13 +4,13 @@ import L from 'leaflet';
 // import { isObjectWithValue } from '../../Utils/object';
 // import CustomPopup from '../CustomPopup/CustomPopup.component';
 // import * as ROUTES from '../../Constants/routes';
-// import { Profile } from '../../Models/profile.models';
-import { MapContainer, TileLayer, useMap, Marker, Popup, Circle } from 'react-leaflet';
+import { TileLayer, useMap, Marker, Popup, Circle } from 'react-leaflet';
 import { DocumentData, QueryDocumentSnapshot } from 'firebase/firestore';
 import { auth } from '../../Firebase/firebase';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { useGeo } from '../../Contexts/geolocation.context';
 import { RADIUS_IN_M } from '../../Constants/locatingParams';
+import ProfilePopup from '../ProfilePopoup/ProfilePopup.component';
 
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 
@@ -60,7 +60,10 @@ export const MapContent: FC<Props> = ({ localUsers }) => {
         const otherUser = localUser.data();
         return user?.uid !== otherUser.uid ? (
           <Marker key={otherUser.uid} position={[otherUser.lat, otherUser.lng]}>
-            <Popup>You are here. {otherUser.username}</Popup>
+            <Popup>
+              {otherUser.username}
+              <ProfilePopup dances={otherUser.dances} />
+            </Popup>
           </Marker>
         ) : null;
       })}
