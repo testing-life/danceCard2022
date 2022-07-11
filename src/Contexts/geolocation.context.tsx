@@ -2,7 +2,7 @@ import React, { createContext, useState, useEffect, useContext } from 'react';
 import { LatLngLiteral } from 'leaflet';
 import * as geofire from 'geofire-common';
 
-interface HashedLocation extends LatLngLiteral {
+export interface HashedLocation extends LatLngLiteral {
   hash: string;
 }
 

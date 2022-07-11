@@ -3,11 +3,14 @@ import { Profile } from '../Models/profile.models';
 import { auth, query, db, collection, getDocs, updateDoc, where, doc } from '../Firebase/firebase';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { Collections } from '../Constants/collections';
+import * as geofire from 'geofire-common';
+import { LatLngLiteral } from 'leaflet';
 
 type ProfileConsumer = {
   profile: any;
   profileError: string;
   updateProfile: (val: any) => void;
+  updateLocationInProfile: (newCoords: LatLngLiteral) => void;
 };
 
 const ProfileContext = React.createContext<ProfileConsumer>({} as ProfileConsumer);
@@ -46,7 +49,20 @@ export const ProfileProvider = ({ ...props }: Props) => {
     }
   };
 
-  return <ProfileContext.Provider value={{ profile, updateProfile, profileError }} {...props} />;
+  const updateLocationInProfile = async (newCoords: LatLngLiteral): Promise<void> => {
+    const userRef = doc(db, Collections.Users, profile.docId);
+    const hash = geofire.geohashForLocation([newCoords.lat, newCoords.lng]);
+    console.log('newCoords', newCoords, hash);
+    if (userRef) {
+      await updateDoc(userRef, { lat: newCoords.lat, lng: newCoords.lng, hash }).catch(e =>
+        setProfileError(e.message),
+      );
+    }
+  };
+
+  return (
+    <ProfileContext.Provider value={{ profile, updateProfile, profileError, updateLocationInProfile }} {...props} />
+  );
 };
 
 const { Consumer: ProfileConsumer } = ProfileContext;

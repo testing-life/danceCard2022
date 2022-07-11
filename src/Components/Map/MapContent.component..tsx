@@ -1,6 +1,6 @@
 import React, { FC, useEffect, useState } from 'react';
 import 'leaflet/dist/leaflet.css';
-import L from 'leaflet';
+import L, { LatLngLiteral } from 'leaflet';
 // import { isObjectWithValue } from '../../Utils/object';
 // import CustomPopup from '../CustomPopup/CustomPopup.component';
 // import * as ROUTES from '../../Constants/routes';
@@ -11,6 +11,7 @@ import { useAuthState } from 'react-firebase-hooks/auth';
 import { useGeo } from '../../Contexts/geolocation.context';
 import { RADIUS_IN_M } from '../../Constants/locatingParams';
 import ProfilePopup from '../ProfilePopoup/ProfilePopup.component';
+import { useProfile } from '../../Contexts/profile.context';
 
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 
@@ -29,25 +30,30 @@ type Props = {
 export const MapContent: FC<Props> = ({ localUsers }) => {
   const [user] = useAuthState(auth);
   const map = useMap();
-  const [position, setPosition] = useState<any>(null);
+  const { profile, updateLocationInProfile } = useProfile();
+  const [position, setPosition] = useState<LatLngLiteral>();
   const { updateLocation } = useGeo();
 
   useEffect(() => {
     map.locate({ setView: true, watch: true, enableHighAccuracy: true }).on('locationfound', function (e) {
-      setPosition((prevState: any) => {
-        if (prevState?.lng !== e.latlng.lng || prevState?.lat !== e.latlng.lat) {
-          // update profile
-          console.log('prevState', prevState);
-        }
-        return e.latlng;
-      });
+      setPosition(e.latlng);
       updateLocation(e.latlng);
       map.flyTo(e.latlng, map.getZoom());
     });
   }, [map]);
 
+  useEffect(() => {
+    const updateLocation = (position: LatLngLiteral) => {
+      updateLocationInProfile(position);
+    };
+
+    if (position && profile) {
+      updateLocation(position);
+    }
+  }, [position]);
+
   const UserLocationMarker = () => {
-    return position === null ? null : (
+    return position === undefined ? null : (
       <Marker position={position}>
         <Circle center={position} pathOptions={{ fillColor: 'blue' }} radius={RADIUS_IN_M} />
         <Popup>
