@@ -50,7 +50,7 @@ export const SignUpComponent: FC = () => {
         </form>
       ) : locationError?.code ? (
         <div>
-          <p>{locationError?.code ? `${locationError.code} ${locationError.message}` : null}</p>
+          <p>{`${locationError.code} ${locationError.message}`}</p>
           <p>
             {ErrorMessages.get(locationError.code)}
             <br />
