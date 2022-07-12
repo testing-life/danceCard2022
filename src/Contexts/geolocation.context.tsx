@@ -8,7 +8,7 @@ export interface HashedLocation extends LatLngLiteral {
 
 type GeolocationConsumer = {
   location: LatLngLiteral;
-  locationError: any;
+  locationError: { message?: string; code?: string };
   updateLocation: (coords: any) => void;
 };
 
@@ -23,11 +23,13 @@ export const GeolocationProvider = ({ ...props }: Props) => {
   const [locationError, setLocationError] = useState({});
 
   const onChange = (coords: any) => {
+    const lat = coords.lat ?? coords.coords.latitude;
+    const lng = coords.lng ?? coords.coords.longitude;
     if (coords) {
       setLocation({
-        lat: coords.lat,
-        lng: coords.lng,
-        hash: geofire.geohashForLocation([coords.lat, coords.lng]),
+        lat,
+        lng,
+        hash: geofire.geohashForLocation([lat, lng]),
       });
     }
   };
@@ -39,12 +41,7 @@ export const GeolocationProvider = ({ ...props }: Props) => {
   const updateLocation = (coords: any) => onChange(coords);
 
   useEffect(() => {
-    // let watchId: any = undefined;
-    // navigator.geolocation.getCurrentPosition(onChange, onError);
-    // watchId = navigator.geolocation.watchPosition(onChange, onError);
-    // return () => {
-    //   navigator.geolocation.clearWatch(watchId);
-    // };
+    navigator.geolocation.getCurrentPosition(onChange, onError);
   }, []);
 
   return <GeolocationContext.Provider value={{ location, locationError, updateLocation }} {...props} />;

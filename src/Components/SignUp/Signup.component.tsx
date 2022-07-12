@@ -39,40 +39,43 @@ export const SignUpComponent: FC = () => {
 
   return (
     <>
-      {
-        Object.entries(location).length !== 0 ? (
-          <form onSubmit={handleSubmit(submitHandler)}>
-            <input required type="text" placeholder="username" {...register('username', { required: true })} />
-            <input required type="email" placeholder="email" {...register('email', { required: true })} />
-            <input required type="password" placeholder="password" {...register('password', { required: true })} />
-            {errors.email && <p>email is required</p>}
-            {error && <p>{error}</p>}
-            <button type="submit">Register</button>
-          </form>
-        ) : (
-          <p>{locationError ? `${locationError.message} ${locationError.code}` : null}</p>
-        )
-        /* //{' '}
-      <p>
-        // {ErrorMessages.get(locationError.code)}
-        // <br />
-        //{' '}
-        <a href="https://browserhow.com/how-to-enable-disable-geolocation-access-in-google-chrome/" target="_blank">
-          // Enable geolocation in Chrome //{' '}
-        </a>
-        // <br />
-        //{' '}
-        <a href="https://browserhow.com/how-to-enable-or-disable-location-access-in-apple-safari/" target="_blank">
-          // Enable geolocation in Safari //{' '}
-        </a>
-        // <br />
-        //{' '}
-        <a href="https://support.mozilla.org/en-US/kb/site-permissions-panel/" target="_blank">
-          // Enable geolocation in Firefox //{' '}
-        </a>
-        //{' '} */
-      }
-      {/* </p> */}
+      {Object.entries(location).length !== 0 ? (
+        <form onSubmit={handleSubmit(submitHandler)}>
+          <input required type="text" placeholder="username" {...register('username', { required: true })} />
+          <input required type="email" placeholder="email" {...register('email', { required: true })} />
+          <input required type="password" placeholder="password" {...register('password', { required: true })} />
+          {errors.email && <p>email is required</p>}
+          {error && <p>{error}</p>}
+          <button type="submit">Register</button>
+        </form>
+      ) : locationError?.code ? (
+        <div>
+          <p>{locationError?.code ? `${locationError.code} ${locationError.message}` : null}</p>
+          <p>
+            {ErrorMessages.get(locationError.code)}
+            <br />
+            <a
+              href="https://browserhow.com/how-to-enable-disable-geolocation-access-in-google-chrome/"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Enable geolocation in Chrome
+            </a>
+            <br />
+            <a
+              href="https://browserhow.com/how-to-enable-or-disable-location-access-in-apple-safari/"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Enable geolocation in Safari
+            </a>
+            <br />
+            <a href="https://support.mozilla.org/en-US/kb/site-permissions-panel/" target="_blank" rel="noreferrer">
+              Enable geolocation in Firefox
+            </a>
+          </p>
+        </div>
+      ) : null}
     </>
   );
 };
