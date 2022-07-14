@@ -1,3 +1,7 @@
-.yourMarker {
-    filter: hue-rotate(110deg);
+.my-div-icon {
+  background: coral;
+  border-radius: 15px;
+  width: 150px;
+  height: 150px;
+  box-shadow: 0 0 5px 5px rgba(0, 0, 0, 0.5);
 }

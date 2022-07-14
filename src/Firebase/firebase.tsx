@@ -20,6 +20,7 @@ import {
   QuerySnapshot,
   updateDoc,
   doc,
+  onSnapshot,
 } from 'firebase/firestore';
 import { Collections } from '../Constants/collections';
 import * as geofire from 'geofire-common';
@@ -93,6 +94,7 @@ export {
   doc,
   createUserWithEmailAndPassword,
   getUsersInRadius,
+  onSnapshot,
 };
 
 //   getCurrentUser = () => this.auth.currentUser;

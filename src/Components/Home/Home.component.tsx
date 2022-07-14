@@ -1,5 +1,5 @@
 import React, { FunctionComponent, useEffect, useState, ChangeEvent } from 'react';
-import { getUsersInRadius } from '../../Firebase/firebase';
+import { getUsersInRadius, query, collection, db, where, onSnapshot, auth } from '../../Firebase/firebase';
 
 // import { LeafletMap } from '../Map/Map.component';
 // import { useGeo } from '../../Contexts/geolocation.context';
@@ -15,23 +15,48 @@ import { DocumentData, QueryDocumentSnapshot } from 'firebase/firestore';
 import { LeafletMap } from '../Map/Map.component';
 import { useProfile } from '../../Contexts/profile.context';
 import { RADIUS_IN_M } from '../../Constants/locatingParams';
+import { Collections } from '../../Constants/collections';
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { updateObjArrayWithOtherArrayOfObj } from '../../Utils/object';
 
 export const HomeComponent: FunctionComponent<any> = () => {
   const { location, locationError } = useGeo();
-  // const { user } = useUser();
-  const { profile } = useProfile();
+  const [user, loading, authError] = useAuthState(auth);
+  const { profile, updateVisibilityInProfile } = useProfile();
   // const [error, setError] = useState<string>();
   const [localUsers, setLocalUsers] = useState<QueryDocumentSnapshot<DocumentData>[]>([]);
   const [radius, setRadius] = useState(RADIUS_IN_M);
 
   const fetchLocalUsers = async (location: any) => {
-    const matches = await getUsersInRadius([location.lat, location.lng], radius);
-    setLocalUsers(matches);
+    const snapshots = await getUsersInRadius([location.lat, location.lng], radius);
+    const users: any[] = [];
+    snapshots.forEach((doc: any) => {
+      users.push(doc.data());
+    });
+    setLocalUsers(users);
   };
 
   const radiusSliderHandler = (e: ChangeEvent<HTMLInputElement>) => {
     setRadius(parseInt(e.target.value));
   };
+
+  const localUsersListener = () => {
+    const userQuery = query(collection(db, Collections.Users));
+
+    const unsubscribe = onSnapshot(userQuery, (querySnapshot: any) => {
+      const newLocalUsers: any[] = [];
+      querySnapshot.forEach((doc: any) => {
+        newLocalUsers.push(doc.data());
+      });
+      setLocalUsers(newLocalUsers);
+    });
+  };
+
+  useEffect(() => {
+    if (user) {
+      localUsersListener();
+    }
+  }, [user]);
 
   useEffect(() => {
     if (Object.keys(location).length) {
@@ -39,22 +64,25 @@ export const HomeComponent: FunctionComponent<any> = () => {
     }
   }, [location, locationError, radius]);
 
-  // const toggleVisiblity = () => {
-  //   const newProfile: Profile = { ...profile, active: !profile.active };
-  //   firebase
-  //     .getUsers()
-  //     .doc(user.uid)
-  //     .set(newProfile, { merge: true })
-  //     .then(
-  //       docRef => {
-  //         setProfile(newProfile);
-  //       },
-  //       (error: Error) => setError(error.message),
-  //     );
-  // };
+  const toggleVisiblity = (e: any) => {
+    if (profile) {
+      updateVisibilityInProfile(!profile.active);
+    }
+  };
 
   return (
     <>
+      <div className="row">
+        {profile && (
+          <p className="column">
+            {profile.username} is currently:{' '}
+            {profile.active ? 'Visible! Happy to dance.' : 'Invisible. Having a quiet moment.'}
+          </p>
+        )}
+        <button className="column" onClick={e => toggleVisiblity(e)}>
+          Toggle visibility
+        </button>
+      </div>
       <div className="row">
         <span>Search radius: {radius / 1000}km</span>
         <input
@@ -67,34 +95,9 @@ export const HomeComponent: FunctionComponent<any> = () => {
           onChange={radiusSliderHandler}
         />
       </div>
-      <LeafletMap localUsers={localUsers} radius={radius} />
-      {/* {error && <p>{error}</p>}
-      <div className="row">
-        <p className="column">
-          You're currently: {profile.active ? 'Visible! Happy to dance.' : 'Invisible. Having a quiet moment.'}{' '}
-        </p>
-        <button className="column" onClick={toggleVisiblity}>
-          Toggle visibility
-        </button>
-      </div>
-      <div className="row">
-        <span>Search radius: {radius}km</span>
-        <input
-          type="range"
-          name="radius"
-          defaultValue={radius}
-          min="1"
-          step="1"
-          max="20"
-          onChange={radiusSliderHandler}
-        />
-      </div>
       {locationError && <p>{locationError.message}</p>}
-      {!!Object.keys(location).length ? (
-        <LeafletMap radius={radius} centre={location} markers={localUsers} userActive={profile.active} />
-      ) : (
-        <p>We do need geolocation to show the map. Please enable it in your browser and reload the page.</p>
-      )} */}
+
+      <LeafletMap localUsers={localUsers} radius={radius} />
     </>
   );
 };

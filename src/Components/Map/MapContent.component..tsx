@@ -12,6 +12,7 @@ import { useGeo } from '../../Contexts/geolocation.context';
 import { RADIUS_IN_M } from '../../Constants/locatingParams';
 import ProfilePopup from '../ProfilePopoup/ProfilePopup.component';
 import { useProfile } from '../../Contexts/profile.context';
+import './Map.component.css';
 
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 
@@ -52,9 +53,11 @@ export const MapContent: FC<Props> = ({ localUsers, radius }) => {
     }
   }, [position]);
 
+  const userIcon = L.divIcon({ className: 'my-div-icon', iconSize: [30, 30] });
+
   const UserLocationMarker = () => {
     return position === undefined ? null : (
-      <Marker position={position}>
+      <Marker position={position} icon={userIcon}>
         <Circle center={position} pathOptions={{ fillColor: 'blue' }} radius={radius} />
         <Popup>
           You are here. <br />
@@ -70,9 +73,8 @@ export const MapContent: FC<Props> = ({ localUsers, radius }) => {
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
       <UserLocationMarker />
-      {localUsers?.map(localUser => {
-        const otherUser = localUser.data();
-        return user?.uid !== otherUser.uid ? (
+      {localUsers?.map((otherUser: any) => {
+        return user?.uid !== otherUser.uid && otherUser.active ? (
           <Marker key={otherUser.uid} position={[otherUser.lat, otherUser.lng]}>
             <Popup>
               {otherUser.username}

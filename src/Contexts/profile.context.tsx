@@ -11,6 +11,7 @@ type ProfileConsumer = {
   profileError: string;
   updateProfile: (val: any) => void;
   updateLocationInProfile: (newCoords: LatLngLiteral) => void;
+  updateVisibilityInProfile: (isActive: boolean) => void;
 };
 
 const ProfileContext = React.createContext<ProfileConsumer>({} as ProfileConsumer);
@@ -24,21 +25,23 @@ export const ProfileProvider = ({ ...props }: Props) => {
   const [user, loading, authError] = useAuthState(auth);
   const [profileError, setProfileError] = useState('');
 
+  const setLocalProfile = async () => {
+    const res = await getUserProfile();
+    if (res) {
+      setProfileInState(res);
+    }
+  };
+
   useEffect(() => {
-    const setLocalProfile = async () => {
-      const res = await getUserProfile();
-      if (res) {
-        setProfileInState(res);
-      }
-    };
     if (!loading && user) {
       setLocalProfile();
     }
   }, [loading, user]);
 
   const getUserProfile = async () => {
-    const q = query(collection(db, Collections.Users), where('uid', '==', user?.uid));
-    const doc = await getDocs(q).catch(e => setProfileError(e.message));
+    const userQuery = query(collection(db, Collections.Users), where('uid', '==', user?.uid));
+
+    const doc = await getDocs(userQuery).catch(e => setProfileError(e.message));
     return doc ? { ...doc.docs[0].data(), docId: doc?.docs[0].id } : null;
   };
 
@@ -46,22 +49,34 @@ export const ProfileProvider = ({ ...props }: Props) => {
     const userRef = doc(db, Collections.Users, profile.docId);
     if (userRef) {
       await updateDoc(userRef, newProfile).catch(e => setProfileError(e.message));
+      setLocalProfile();
     }
   };
 
   const updateLocationInProfile = async (newCoords: LatLngLiteral): Promise<void> => {
     const userRef = doc(db, Collections.Users, profile.docId);
     const hash = geofire.geohashForLocation([newCoords.lat, newCoords.lng]);
-    console.log('newCoords', newCoords, hash);
     if (userRef) {
       await updateDoc(userRef, { lat: newCoords.lat, lng: newCoords.lng, hash }).catch(e =>
         setProfileError(e.message),
       );
+      getUserProfile();
+    }
+  };
+
+  const updateVisibilityInProfile = async (isActive: boolean): Promise<void> => {
+    const userRef = doc(db, Collections.Users, profile.docId);
+    if (userRef) {
+      await updateDoc(userRef, { active: isActive }).catch(e => setProfileError(e.message));
+      setLocalProfile();
     }
   };
 
   return (
-    <ProfileContext.Provider value={{ profile, updateProfile, profileError, updateLocationInProfile }} {...props} />
+    <ProfileContext.Provider
+      value={{ profile, updateProfile, profileError, updateLocationInProfile, updateVisibilityInProfile }}
+      {...props}
+    />
   );
 };
 
