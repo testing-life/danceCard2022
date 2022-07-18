@@ -45,9 +45,30 @@ const App = () => {
                 </PrivateRoute>
               }
             />
-            <Route path={ROUTES.CHAT} element={<ChatPage />} />
-            <Route path={ROUTES.CHATS} element={<ChatsListPage />} />
-            <Route path={ROUTES.SINGLE_CHAT} element={<SingleChatPage />} />
+            <Route
+              path={ROUTES.SINGLE_CHAT}
+              element={
+                <PrivateRoute>
+                  <SingleChatPage />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path={ROUTES.CHATS}
+              element={
+                <PrivateRoute>
+                  <ChatsListPage />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path={ROUTES.CHAT}
+              element={
+                <PrivateRoute>
+                  <ChatPage />
+                </PrivateRoute>
+              }
+            />
           </Route>
         </Routes>
       </BrowserRouter>

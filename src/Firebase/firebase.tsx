@@ -21,6 +21,7 @@ import {
   updateDoc,
   doc,
   onSnapshot,
+  arrayUnion,
 } from 'firebase/firestore';
 import { Collections } from '../Constants/collections';
 import * as geofire from 'geofire-common';
@@ -38,7 +39,6 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
-
 const doEmailSignIn = async (email: string, password: string) =>
   await signInWithEmailAndPassword(auth, email, password);
 
@@ -81,6 +81,7 @@ const getUsersInRadius = async (
 export {
   auth,
   db,
+  arrayUnion,
   query,
   collection,
   doEmailSignIn,

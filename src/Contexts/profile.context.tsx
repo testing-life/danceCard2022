@@ -8,6 +8,7 @@ import { LatLngLiteral } from 'leaflet';
 
 type ProfileConsumer = {
   profile: any;
+  chatDocs: any;
   profileError: string;
   updateProfile: (val: any) => void;
   updateLocationInProfile: (newCoords: LatLngLiteral) => void;
@@ -24,6 +25,7 @@ export const ProfileProvider = ({ ...props }: Props) => {
   const [profile, setProfileInState] = useState<any>();
   const [user, loading, authError] = useAuthState(auth);
   const [profileError, setProfileError] = useState('');
+  const [chatDocs, setChatDocs] = useState<any>();
 
   const setLocalProfile = async () => {
     const res = await getUserProfile();
@@ -32,9 +34,17 @@ export const ProfileProvider = ({ ...props }: Props) => {
     }
   };
 
+  const setLocalChats = async () => {
+    const res = await getUserChats();
+    if (res) {
+      setChatDocs(res);
+    }
+  };
+
   useEffect(() => {
     if (!loading && user) {
       setLocalProfile();
+      setLocalChats();
     }
   }, [loading, user]);
 
@@ -43,6 +53,13 @@ export const ProfileProvider = ({ ...props }: Props) => {
 
     const doc = await getDocs(userQuery).catch(e => setProfileError(e.message));
     return doc ? { ...doc.docs[0].data(), docId: doc?.docs[0].id } : null;
+  };
+
+  const getUserChats = async () => {
+    const chatsQuery = query(collection(db, Collections.Chats), where('members', 'array-contains', user?.uid));
+
+    const doc = await getDocs(chatsQuery).catch(e => setProfileError(e.message));
+    return doc ? doc.docs : null;
   };
 
   const updateProfile = async (newProfile: any): Promise<void> => {
@@ -74,7 +91,7 @@ export const ProfileProvider = ({ ...props }: Props) => {
 
   return (
     <ProfileContext.Provider
-      value={{ profile, updateProfile, profileError, updateLocationInProfile, updateVisibilityInProfile }}
+      value={{ profile, updateProfile, chatDocs, profileError, updateLocationInProfile, updateVisibilityInProfile }}
       {...props}
     />
   );

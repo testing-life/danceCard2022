@@ -3,7 +3,7 @@ import 'leaflet/dist/leaflet.css';
 import L, { LatLngLiteral } from 'leaflet';
 // import { isObjectWithValue } from '../../Utils/object';
 // import CustomPopup from '../CustomPopup/CustomPopup.component';
-// import * as ROUTES from '../../Constants/routes';
+import * as ROUTES from '../../Constants/routes';
 import { TileLayer, useMap, Marker, Popup, Circle } from 'react-leaflet';
 import { DocumentData, QueryDocumentSnapshot } from 'firebase/firestore';
 import { auth } from '../../Firebase/firebase';
@@ -13,6 +13,7 @@ import { RADIUS_IN_M } from '../../Constants/locatingParams';
 import ProfilePopup from '../ProfilePopoup/ProfilePopup.component';
 import { useProfile } from '../../Contexts/profile.context';
 import './Map.component.css';
+import { Link } from 'react-router-dom';
 
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 
@@ -79,6 +80,16 @@ export const MapContent: FC<Props> = ({ localUsers, radius }) => {
             <Popup>
               {otherUser.username}
               <ProfilePopup dances={otherUser.dances} />
+              <Link
+                to={ROUTES.CHATS}
+                state={{
+                  targetUserDocID: otherUser.docId,
+                  targetUserID: otherUser.uid,
+                  targetUsername: otherUser.username,
+                }}
+              >
+                Message
+              </Link>
             </Popup>
           </Marker>
         ) : null;

@@ -29,12 +29,9 @@ const NavigationComponent: FunctionComponent = () => {
         <Link className="button" to={ROUTES.PROFILE}>
           Profile
         </Link>
-        {/* <Link
-          className={`button ${profile.active ? '' : 'disabled'}`}
-          to={profile.active ? ROUTES.CHATS : './'}
-        >
+        <Link className={`button`} to={ROUTES.CHATS}>
           Chats
-        </Link> */}
+        </Link>
         <button
           className="button button-outline"
           onClick={() => {
