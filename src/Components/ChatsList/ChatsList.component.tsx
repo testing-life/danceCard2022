@@ -14,25 +14,24 @@ const ChatsListComponent: FC = () => {
   const { profile } = useProfile();
   // const { msg } = useMsgNotification();
   const [isFlashed, setIsFlashed] = useState(false);
-  let unsub: any = null;
+  let unsubscribe: any = null;
 
   useEffect(() => {
-    localChatsListener();
+    if (profile) {
+      localChatsListener();
+    }
 
-    return () => unsub();
+    return () => unsubscribe;
   }, [profile]);
 
   const localChatsListener = () => {
-    if (!profile) {
-      return;
-    }
     const chatsQuery = query(
       collection(db, Collections.Chats),
       where('members', 'array-contains', profile?.uid),
       orderBy('last_updated'),
     );
 
-    unsub = onSnapshot(chatsQuery, (querySnapshot: any) => {
+    unsubscribe = onSnapshot(chatsQuery, (querySnapshot: any) => {
       const newLocalChats: any[] = [];
       querySnapshot.forEach((doc: any) => {
         newLocalChats.push({ ...doc.data(), docId: doc.id });

@@ -87,7 +87,7 @@ const ChatInputComponent: FunctionComponent<Props> = ({ ...props }) => {
           <input
             type="text"
             name="message"
-            placeholder={!currentChatId ? `Your first message to ${targetUsername}` : 'Write message'}
+            placeholder={!currentChatId ? `Start a new chat with ${targetUsername}` : 'Write message'}
             value={message}
             onChange={event => setMessage(event.target.value)}
           />
