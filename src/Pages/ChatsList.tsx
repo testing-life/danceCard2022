@@ -11,7 +11,8 @@ export const ChatsListPage = () => {
   return (
     <ProfileProvider>
       <NavigationComponent />
-      <ChatInputComponent routeProps={location!.state} />
+      {location?.state ? <ChatInputComponent routeProps={location!.state} /> : null}
+
       <ChatsListComponent />
     </ProfileProvider>
   );

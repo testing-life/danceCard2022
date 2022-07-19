@@ -14,21 +14,25 @@ const ChatsListComponent: FC = () => {
   const { profile } = useProfile();
   // const { msg } = useMsgNotification();
   const [isFlashed, setIsFlashed] = useState(false);
+  let unsub: any = null;
 
   useEffect(() => {
-    if (profile) {
-      localChatsListener();
-    }
+    localChatsListener();
+
+    return () => unsub();
   }, [profile]);
 
   const localChatsListener = () => {
+    if (!profile) {
+      return;
+    }
     const chatsQuery = query(
       collection(db, Collections.Chats),
       where('members', 'array-contains', profile?.uid),
       orderBy('last_updated'),
     );
 
-    const unsubscribe = onSnapshot(chatsQuery, (querySnapshot: any) => {
+    unsub = onSnapshot(chatsQuery, (querySnapshot: any) => {
       const newLocalChats: any[] = [];
       querySnapshot.forEach((doc: any) => {
         newLocalChats.push({ ...doc.data(), docId: doc.id });
@@ -39,7 +43,6 @@ const ChatsListComponent: FC = () => {
 
   return (
     <>
-      {console.log('first', localChats)}
       {!localChats?.length && <p>no chats</p>}
       {localChats?.map((item: any, index: number) => {
         const messages = isObjectWithValue(item, 'messages') ? item.messages.sort(sortMessagesDesc) : undefined;
@@ -79,8 +82,6 @@ const ChatsListComponent: FC = () => {
                     </div>
                   ),
                 )}
-                {console.log('existingChatID', existingChatID)}
-                {existingChatID}
                 <ChatInputComponent
                   routeProps={{ targetUserID: targetUserID(), existingChatID, targetUsername: messages[0]?.toName }}
                 />

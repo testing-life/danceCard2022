@@ -2,7 +2,6 @@ import React, { FC, useEffect, useState } from 'react';
 import 'leaflet/dist/leaflet.css';
 import L, { LatLngLiteral } from 'leaflet';
 // import { isObjectWithValue } from '../../Utils/object';
-// import CustomPopup from '../CustomPopup/CustomPopup.component';
 import * as ROUTES from '../../Constants/routes';
 import { TileLayer, useMap, Marker, Popup, Circle } from 'react-leaflet';
 import { DocumentData, QueryDocumentSnapshot } from 'firebase/firestore';
@@ -80,7 +79,6 @@ export const MapContent: FC<Props> = ({ localUsers, radius }) => {
             <Popup>
               {otherUser.username}
               <ProfilePopup dances={otherUser.dances} />
-              {/* single chat ? */}
               <Link
                 to={ROUTES.CHATS}
                 state={{

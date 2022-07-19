@@ -84,7 +84,6 @@ const ChatInputComponent: FunctionComponent<Props> = ({ ...props }) => {
     <>
       {(targetUsername || targetUserID) && (
         <form onSubmit={submitHandler} className="container">
-          {existingChatID}
           <input
             type="text"
             name="message"
