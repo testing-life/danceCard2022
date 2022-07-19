@@ -1,13 +1,9 @@
 import React, { FunctionComponent, useState, FormEvent, useEffect } from 'react';
-import { useUser } from '../../Contexts/user.context';
 import { useProfile } from '../../Contexts/profile.context';
-import { GeoDocumentReference } from 'geofirestore/dist/GeoDocumentReference';
-import { Profile } from '../../Models/profile.models';
 import * as ROUTES from '../../Constants/routes';
 import { useNavigate } from 'react-router-dom';
-import { addDoc, auth, collection, db, doc, updateDoc, arrayUnion } from '../../Firebase/firebase';
+import { addDoc, collection, db, doc, updateDoc, arrayUnion } from '../../Firebase/firebase';
 import { Collections } from '../../Constants/collections';
-import { useDocumentDataOnce } from 'react-firebase-hooks/firestore';
 
 type Props = {
   routeProps: any;
@@ -19,8 +15,7 @@ const ChatInputComponent: FunctionComponent<Props> = ({ ...props }) => {
   const [error, setError] = useState('');
   const [isSending, setIsSending] = useState(false);
   const [currentChatId, setCurrentChatId] = useState('');
-  const navigate = useNavigate();
-  const { profile, chatDocs } = useProfile();
+  const { profile } = useProfile();
 
   useEffect(() => {
     if (existingChatID) {
@@ -55,104 +50,41 @@ const ChatInputComponent: FunctionComponent<Props> = ({ ...props }) => {
           message: message,
           timestamp: +new Date(),
         }),
+        last_updated: +new Date(),
       })
-        .catch(e => console.error(e.message))
+        .catch(e => setError(e.message))
         .finally(() => setIsSending(false));
     } else {
       const ref = await addDoc(collection(db, Collections.Chats), {
         members: [targetUserID, profile.uid],
         last_updated: +new Date(),
       }).catch((error: Error) => setError(error.message));
-      console.log('res', ref);
       if (ref) {
         setCurrentChatId(ref.id);
         updateChatsIdInProfile(ref.id);
-        const res = await updateDoc(ref, {
-          messages: {
-            fromName: profile.username,
-            toName: targetUsername,
-            fromID: profile.uid,
-            message: message,
-            timestamp: +new Date(),
-          },
+        await updateDoc(ref, {
+          messages: [
+            {
+              fromName: profile.username,
+              toName: targetUsername,
+              fromID: profile.uid,
+              message: message,
+              timestamp: +new Date(),
+            },
+          ],
         })
-          .catch(e => console.error(e.message))
+          .catch(e => setError(e.message))
           .finally(() => setIsSending(false));
-        console.log('res', res);
       }
-      // firebase
-      //   .getChats()
-      //   .add({ members: [targetUserID, user.uid], last_updated: +new Date() })
-      //   .then(refID => {
-      //     setCurrentChatId(refID.id);
-      //     updateChatsIdInProfile(refID.id);
-      //     refID
-      //       .update({
-      //         messages: firebase.fieldValue.arrayUnion({
-      //           fromName: profile.username,
-      //           toName: targetUsername,
-      //           fromID: user.uid,
-      //           message: message,
-      //           timestamp: +new Date(),
-      //         }),
-      //       })
-      //       .then(() => {
-      //         setIsSending(false);
-      //         navigate(ROUTES.CHATS);
-      //       })
-      //       .catch((e: Error) => setError(e));
-      //   });
     }
     setMessage('');
   };
-  // if (currentChatId) {
-  //   firebase
-  //     .getChats()
-  //     .doc(currentChatId)
-  //     .update({
-  //       messages: firebase.fieldValue.arrayUnion({
-  //         toName: targetUsername,
-  //         fromName: profile.username,
-  //         fromID: user.uid,
-  //         message: message,
-  //         timestamp: +new Date(),
-  //       }),
-  //       last_updated: +new Date(),
-  //     })
-  //     .then(() => {
-  //       setIsSending(false);
-  //     })
-  //     .catch((e: Error) => setError(e));
-  //   setMessage('');
-  // } else {
-  //   firebase
-  //     .getChats()
-  //     .add({ members: [targetUserID, user.uid], last_updated: +new Date() })
-  //     .then(refID => {
-  //       setCurrentChatId(refID.id);
-  //       updateChatsIdInProfile(refID.id);
-  //       refID
-  //         .update({
-  //           messages: firebase.fieldValue.arrayUnion({
-  //             fromName: profile.username,
-  //             toName: targetUsername,
-  //             fromID: user.uid,
-  //             message: message,
-  //             timestamp: +new Date(),
-  //           }),
-  //         })
-  //         .then(() => {
-  //           setIsSending(false);
-  //           navigate(ROUTES.CHATS);
-  //         })
-  //         .catch((e: Error) => setError(e));
-  //     });
-  // }
-  // setMessage('');
+
   return (
     <>
       {(targetUsername || targetUserID) && (
         <form onSubmit={submitHandler} className="container">
+          {existingChatID}
           <input
             type="text"
             name="message"

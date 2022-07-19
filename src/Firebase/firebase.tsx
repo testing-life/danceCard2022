@@ -82,6 +82,7 @@ export {
   auth,
   db,
   arrayUnion,
+  orderBy,
   query,
   collection,
   doEmailSignIn,

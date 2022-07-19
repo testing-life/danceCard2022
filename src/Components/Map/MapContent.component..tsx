@@ -80,6 +80,7 @@ export const MapContent: FC<Props> = ({ localUsers, radius }) => {
             <Popup>
               {otherUser.username}
               <ProfilePopup dances={otherUser.dances} />
+              {/* single chat ? */}
               <Link
                 to={ROUTES.CHATS}
                 state={{

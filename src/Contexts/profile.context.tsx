@@ -54,7 +54,7 @@ export const ProfileProvider = ({ ...props }: Props) => {
     const doc = await getDocs(userQuery).catch(e => setProfileError(e.message));
     return doc ? { ...doc.docs[0].data(), docId: doc?.docs[0].id } : null;
   };
-
+  // redundant?
   const getUserChats = async () => {
     const chatsQuery = query(collection(db, Collections.Chats), where('members', 'array-contains', user?.uid));
 
