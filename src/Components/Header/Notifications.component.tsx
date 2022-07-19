@@ -1,20 +1,20 @@
-import React, { FunctionComponent, Fragment, useEffect } from 'react';
-// import { useMsgNotification } from '../../Contexts/messageNotification.context';
-// import { Link } from '@reach/router';
-// import * as ROUTES from '../../Constants/routes';
-// import { useUser } from '../../Contexts/user.context';
+import React, { FunctionComponent, Fragment } from 'react';
+import { Link } from 'react-router-dom';
+import { useMsgNotification } from '../../Contexts/messageNotification.context';
+import { useProfile } from '../../Contexts/profile.context';
+import * as ROUTES from '../../Constants/routes';
 
 const NotificationComponent: FunctionComponent = () => {
-  // const { msg } = useMsgNotification();
-  // const { user } = useUser();
+  const { msg } = useMsgNotification();
+  const { profile } = useProfile();
 
-  // const lastMessage = msg?.exists ? msg?.data().messages[msg?.data().messages.length - 1] : undefined;
-  // const lastMessageSenderId = lastMessage?.fromID;
-  // const fromMe = lastMessageSenderId === user.uid ? true : false;
+  const lastMessage = msg?.exists ? msg?.data().messages[msg?.data().messages.length - 1] : undefined;
+  const lastMessageSenderId = lastMessage?.fromID;
+  const fromMe = lastMessageSenderId === profile?.uid ? true : false;
 
   return (
     <Fragment>
-      {/* {lastMessage && !fromMe ? (
+      {lastMessage && !fromMe ? (
         <Fragment>
           <span>
             Latest message: <strong>{lastMessage.message}</strong>{' '}
@@ -23,7 +23,7 @@ const NotificationComponent: FunctionComponent = () => {
             Go to chat
           </Link>
         </Fragment>
-      ) : null} */}
+      ) : null}
     </Fragment>
   );
 };
