@@ -46,13 +46,6 @@ export const MsgNotificationProvider = ({ ...props }: Props) => {
 
       unsubscribe = onSnapshot(chatsQuery, (querySnapshot: any) => {
         querySnapshot.docChanges().forEach(({ doc }: DocumentData) => {
-          if (doc.type === 'added') {
-            console.log('New city: ', doc.data());
-          }
-          if (doc.type === 'modified') {
-            console.log('Modified city: ', doc.data());
-          }
-
           if (doc?.data().hasOwnProperty('messages')) {
             setMsg(doc);
           }

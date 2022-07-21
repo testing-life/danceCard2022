@@ -6,7 +6,7 @@ import './ChatsList.component.css';
 import { isObjectWithValue } from '../../Utils/object';
 import { Collections } from '../../Constants/collections';
 import { useProfile } from '../../Contexts/profile.context';
-import { sortMessagesDesc } from '../../Utils/array';
+import { sortChatsAsc, sortMessagesDesc } from '../../Utils/array';
 
 const ChatsListComponent: FC = () => {
   // QueryDocumentSnapshot
@@ -44,14 +44,13 @@ const ChatsListComponent: FC = () => {
     <>
       {!localChats?.length && <p>no chats</p>}
       {localChats?.map((item: any, index: number) => {
-        const messages = isObjectWithValue(item, 'messages') ? item.messages.sort(sortMessagesDesc) : undefined;
+        const messages = isObjectWithValue(item, 'messages') ? item.messages.sort(sortChatsAsc) : undefined;
         const existingChatID: string = item.docId;
         const targetUserID = () => item.members.find((id: string) => id !== profile.uid);
         return (
           <div key={`${index}`}>
             {messages ? (
               <details className="container" open={isFlashed && index === 0 ? true : false}>
-                {index}
                 <summary
                   className={isFlashed && index === 0 ? 'isFlashed' : ''}
                   onClick={() => isFlashed && index === 0 && setIsFlashed(false)}
