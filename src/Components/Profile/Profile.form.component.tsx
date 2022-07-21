@@ -15,7 +15,7 @@ const ProfileFormComponent: FC = () => {
     }
     const { name, checked } = e.target;
     const danceObj = profile.dances[name as DanceName];
-    // fix obj indexing with keyof
+    // TODO fix obj indexing with keyof
     (danceObj as any)[position] = checked;
     const dances = { ...profile.dances, [name]: danceObj };
     setFormData({ ...formData, dances });

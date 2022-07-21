@@ -1,4 +1,4 @@
-import Dances, { Dance, DanceMap } from '../Constants/dances';
+import Dances, { DanceMap } from '../Constants/dances';
 
 export type IProfile = {
   active: boolean;
