@@ -1,7 +1,6 @@
 import React, { FunctionComponent, Fragment, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as ROUTES from '../../Constants/routes';
-import { useUser } from '../../Contexts/user.context';
 // import Firebase from '../../Firebase/firebase';
 // import { Profile } from '../../Models/profile.models';
 // import { useProfile } from '../../Contexts/profile.context';

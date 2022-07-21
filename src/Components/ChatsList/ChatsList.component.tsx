@@ -6,7 +6,7 @@ import './ChatsList.component.css';
 import { isObjectWithValue } from '../../Utils/object';
 import { Collections } from '../../Constants/collections';
 import { useProfile } from '../../Contexts/profile.context';
-import { sortChatsAsc, sortMessagesDesc } from '../../Utils/array';
+import { sortChatsAsc } from '../../Utils/array';
 
 const ChatsListComponent: FC = () => {
   // QueryDocumentSnapshot

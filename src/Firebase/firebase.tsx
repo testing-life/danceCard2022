@@ -63,7 +63,6 @@ const getUsersInRadius = async (
   const snapshots = await Promise.all(promises).catch((e: Error) => console.error(e));
   if (snapshots) {
     for (const snap of snapshots) {
-      // console.log('snap.docs[0].data()', snap.docs[0].data());
       for (const doc of snap.docs) {
         const lat = doc.get('lat');
         const lng = doc.get('lng');
@@ -98,10 +97,3 @@ export {
   getUsersInRadius,
   onSnapshot,
 };
-
-//   getCurrentUser = () => this.auth.currentUser;
-//   getUsers = (): GeoCollectionReference => this.geofirestore.collection(Collections.Users);
-//   getChats = () => this.firestore.collection(Collections.Chats);
-//   getGeoPoint = (latitude: number, longitude: number) => new this.firestoreRef.GeoPoint(latitude, longitude);
-// }
-// export default Firebase;
