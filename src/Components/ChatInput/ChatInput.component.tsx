@@ -24,7 +24,7 @@ const ChatInputComponent: FunctionComponent<Props> = ({ ...props }) => {
   }, []);
 
   const updateChatsIdInProfile = async (chatID: string) => {
-    if ((profile.chats as string[]).includes(chatID)) {
+    if (!profile || (profile.chats as string[]).includes(chatID)) {
       return;
     }
     const chats: string[] = Array.from(new Set([...profile.chats, chatID]));
@@ -39,6 +39,9 @@ const ChatInputComponent: FunctionComponent<Props> = ({ ...props }) => {
 
   const submitHandler = async (e: FormEvent) => {
     e.preventDefault();
+    if (!profile) {
+      return;
+    }
     setIsSending(true);
     if (currentChatId) {
       const docRef = doc(db, Collections.Chats, currentChatId);

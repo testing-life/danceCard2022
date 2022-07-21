@@ -46,7 +46,7 @@ const ChatsListComponent: FC = () => {
       {localChats?.map((item: any, index: number) => {
         const messages = isObjectWithValue(item, 'messages') ? item.messages.sort(sortChatsAsc) : undefined;
         const existingChatID: string = item.docId;
-        const targetUserID = () => item.members.find((id: string) => id !== profile.uid);
+        const targetUserID = () => item.members.find((id: string) => id !== profile!.uid);
         return (
           <div key={`${index}`}>
             {messages ? (
@@ -75,7 +75,7 @@ const ChatsListComponent: FC = () => {
                     },
                     index: number,
                   ) => (
-                    <div className={item.fromID === profile.uid ? 'messageBoxFrom' : 'messageBoxTo'} key={`${index}`}>
+                    <div className={item.fromID === profile!.uid ? 'messageBoxFrom' : 'messageBoxTo'} key={`${index}`}>
                       <strong> From: {item.fromName}</strong> <p>{item.message}</p>
                     </div>
                   ),

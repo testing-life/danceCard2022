@@ -26,11 +26,11 @@ export const SignUpComponent: FC = () => {
     );
     const user = res.user;
     const updateRes = await addDoc(collection(db, Collections.Users), {
+      ...Profile.create(),
       uid: user.uid,
       username,
       email,
       ...location,
-      ...Profile.create(),
     }).catch((error: Error) => setError(error.message));
     if (updateRes) {
       navigate(ROUTES.LOG_IN);

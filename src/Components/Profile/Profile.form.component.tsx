@@ -1,17 +1,22 @@
-import React, { useState, FC } from 'react';
+import React, { useState, FC, ChangeEvent } from 'react';
 import { useProfile } from '../../Contexts/profile.context';
+import { Profile } from '../../Models/profile.models';
+import { Dance } from '../../Constants/dances';
 import './Profile.form.component.css';
 
 const ProfileFormComponent: FC = () => {
-  const [formData, setFormData] = useState({});
+  const [formData, setFormData] = useState<Profile>({} as Profile);
   const [updating, setUpdating] = useState(false);
   const { profile, updateProfile, profileError } = useProfile();
 
-  const updateDanceObj = (e: any, position: string) => {
-    const name = e.target.name;
-    const value = e.target.checked;
+  const updateDanceObj = (e: ChangeEvent<HTMLInputElement>, position: keyof Dance) => {
+    if (!profile) {
+      return;
+    }
+    const { name, checked } = e.target;
     const danceObj = profile.dances[name];
-    danceObj[position] = value;
+    // fix obj indexing with keyof
+    (danceObj as any)[position] = checked;
     const dances = { ...profile.dances, [name]: danceObj };
     setFormData({ ...formData, dances });
   };

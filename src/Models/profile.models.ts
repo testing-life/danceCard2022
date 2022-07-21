@@ -5,7 +5,12 @@ export type IProfile = {
   chats: string[];
   dances: DanceMap;
   docId: string;
-  // dances: [string, DancePosition][] ;
+  email: string;
+  hash: string;
+  lat: number;
+  lng: number;
+  uid: string;
+  username: string;
 };
 
 export class Profile implements IProfile {
@@ -13,6 +18,12 @@ export class Profile implements IProfile {
   chats = [];
   dances = Dances;
   docId = '';
+  email = '';
+  hash = '';
+  lat = 0;
+  lng = 0;
+  uid = '';
+  username = '';
   static create(): Profile {
     return new Profile();
   }

@@ -7,10 +7,9 @@ import * as geofire from 'geofire-common';
 import { LatLngLiteral } from 'leaflet';
 
 type ProfileConsumer = {
-  profile: any;
-  chatDocs: any;
+  profile: Profile | undefined;
   profileError: string;
-  updateProfile: (val: any) => void;
+  updateProfile: (newProfile: Profile) => void;
   updateLocationInProfile: (newCoords: LatLngLiteral) => void;
   updateVisibilityInProfile: (isActive: boolean) => void;
 };
@@ -22,10 +21,9 @@ type Props = {
 };
 
 export const ProfileProvider = ({ ...props }: Props) => {
-  const [profile, setProfileInState] = useState<any>();
+  const [profile, setProfileInState] = useState<Profile>();
   const [user, loading, authError] = useAuthState(auth);
   const [profileError, setProfileError] = useState('');
-  const [chatDocs, setChatDocs] = useState<any>();
 
   const setLocalProfile = async () => {
     const res = await getUserProfile();
@@ -34,17 +32,9 @@ export const ProfileProvider = ({ ...props }: Props) => {
     }
   };
 
-  const setLocalChats = async () => {
-    const res = await getUserChats();
-    if (res) {
-      setChatDocs(res);
-    }
-  };
-
   useEffect(() => {
     if (!loading && user) {
       setLocalProfile();
-      setLocalChats();
     }
   }, [loading, user]);
 
@@ -52,18 +42,13 @@ export const ProfileProvider = ({ ...props }: Props) => {
     const userQuery = query(collection(db, Collections.Users), where('uid', '==', user?.uid));
 
     const doc = await getDocs(userQuery).catch(e => setProfileError(e.message));
-    return doc ? { ...doc.docs[0].data(), docId: doc?.docs[0].id } : null;
-  };
-  // redundant?
-  const getUserChats = async () => {
-    const chatsQuery = query(collection(db, Collections.Chats), where('members', 'array-contains', user?.uid));
-
-    const doc = await getDocs(chatsQuery).catch(e => setProfileError(e.message));
-    return doc ? doc.docs : null;
+    const profileData = doc ? ({ ...doc.docs[0].data(), docId: doc?.docs[0].id } as Profile) : null;
+    return profileData;
   };
 
+  //
   const updateProfile = async (newProfile: any): Promise<void> => {
-    const userRef = doc(db, Collections.Users, profile.docId);
+    const userRef = profile && doc(db, Collections.Users, profile.docId);
     if (userRef) {
       await updateDoc(userRef, newProfile).catch(e => setProfileError(e.message));
       setLocalProfile();
@@ -71,7 +56,7 @@ export const ProfileProvider = ({ ...props }: Props) => {
   };
 
   const updateLocationInProfile = async (newCoords: LatLngLiteral): Promise<void> => {
-    const userRef = doc(db, Collections.Users, profile.docId);
+    const userRef = profile && doc(db, Collections.Users, profile.docId);
     const hash = geofire.geohashForLocation([newCoords.lat, newCoords.lng]);
     if (userRef) {
       await updateDoc(userRef, { lat: newCoords.lat, lng: newCoords.lng, hash }).catch(e =>
@@ -82,7 +67,7 @@ export const ProfileProvider = ({ ...props }: Props) => {
   };
 
   const updateVisibilityInProfile = async (isActive: boolean): Promise<void> => {
-    const userRef = doc(db, Collections.Users, profile.docId);
+    const userRef = profile && doc(db, Collections.Users, profile.docId);
     if (userRef) {
       await updateDoc(userRef, { active: isActive }).catch(e => setProfileError(e.message));
       setLocalProfile();
@@ -91,7 +76,7 @@ export const ProfileProvider = ({ ...props }: Props) => {
 
   return (
     <ProfileContext.Provider
-      value={{ profile, updateProfile, chatDocs, profileError, updateLocationInProfile, updateVisibilityInProfile }}
+      value={{ profile, updateProfile, profileError, updateLocationInProfile, updateVisibilityInProfile }}
       {...props}
     />
   );
