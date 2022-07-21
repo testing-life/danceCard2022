@@ -4,8 +4,20 @@ export interface Dance {
   follow: boolean;
 }
 
+export type DanceName =
+  | 'lindy-hop'
+  | 'blues'
+  | 'fuston'
+  | 'balboa'
+  | 'collegiate-shag'
+  | 'salsa'
+  | 'bachata'
+  | 'tango'
+  | 'kizomba'
+  | 'bal-folk';
+
 export type DanceMap = {
-  [key: string]: Dance;
+  [key in DanceName]: Dance;
 };
 
 const Dances: DanceMap = {

@@ -1,7 +1,7 @@
 import React, { useState, FC, ChangeEvent } from 'react';
 import { useProfile } from '../../Contexts/profile.context';
 import { Profile } from '../../Models/profile.models';
-import { Dance } from '../../Constants/dances';
+import { Dance, DanceName } from '../../Constants/dances';
 import './Profile.form.component.css';
 
 const ProfileFormComponent: FC = () => {
@@ -14,14 +14,14 @@ const ProfileFormComponent: FC = () => {
       return;
     }
     const { name, checked } = e.target;
-    const danceObj = profile.dances[name];
+    const danceObj = profile.dances[name as DanceName];
     // fix obj indexing with keyof
     (danceObj as any)[position] = checked;
     const dances = { ...profile.dances, [name]: danceObj };
     setFormData({ ...formData, dances });
   };
 
-  const onSubmit = async (e: any) => {
+  const onSubmit = async (e: ChangeEvent<HTMLFormElement>) => {
     e.preventDefault();
     updateProfile(formData);
   };
@@ -40,7 +40,9 @@ const ProfileFormComponent: FC = () => {
                   defaultValue={profile.username}
                   placeholder="username"
                   name="username"
-                  onInput={(e: any) => setFormData({ ...formData, [e.target.name]: e.target.value })}
+                  onInput={(e: ChangeEvent<HTMLInputElement>) =>
+                    setFormData({ ...formData, [e.target.name]: e.target.value })
+                  }
                 />
               </label>
             </li>
@@ -51,14 +53,16 @@ const ProfileFormComponent: FC = () => {
                   type="checkbox"
                   defaultChecked={profile.active}
                   name="active"
-                  onInput={(e: any) => setFormData({ ...formData, [e.target.name]: e.target.checked })}
+                  onInput={(e: ChangeEvent<HTMLInputElement>) =>
+                    setFormData({ ...formData, [e.target.name]: e.target.checked })
+                  }
                 />
               </label>
             </li>
             {!!Object.keys(profile).length &&
               Object.entries(profile.dances).map((dance: any, index: number) => {
-                const danceName: string = dance[0];
-                const positionsObj: any = dance[1];
+                const danceName: DanceName = dance[0];
+                const positionsObj: Dance = dance[1];
                 return (
                   <li key={index} className={`danceItem`}>
                     <b className="">{danceName}</b>
@@ -68,7 +72,7 @@ const ProfileFormComponent: FC = () => {
                         <input
                           type="checkbox"
                           name={danceName}
-                          onInput={(e: any) => updateDanceObj(e, 'lead')}
+                          onInput={(e: ChangeEvent<HTMLInputElement>) => updateDanceObj(e, 'lead')}
                           id={`${danceName}-lead`}
                           defaultChecked={positionsObj.lead}
                         />
@@ -80,7 +84,7 @@ const ProfileFormComponent: FC = () => {
                         <input
                           type="checkbox"
                           name={danceName}
-                          onInput={(e: any) => updateDanceObj(e, 'follow')}
+                          onInput={(e: ChangeEvent<HTMLInputElement>) => updateDanceObj(e, 'follow')}
                           id={`${danceName}-follow`}
                           defaultChecked={positionsObj.follow}
                         />
