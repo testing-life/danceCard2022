@@ -30,8 +30,18 @@ export const LoginComponent: FC = () => {
   return (
     <div className="container">
       <form onSubmit={handleSubmit(submitHandler)}>
-        <input type="email" placeholder="email" {...register('email', { required: true })} />
-        <input type="password" placeholder="password" {...register('password', { required: true })} />
+        <label>
+          {' '}
+          Email
+          <br />
+          <input type="email" placeholder="email" {...register('email', { required: true })} />
+        </label>
+        <br /> <br />
+        <label>
+          <br />
+          <input type="password" placeholder="password" {...register('password', { required: true })} />
+        </label>
+        <br /> <br />
         {signinError && <p>{signinError}</p>}
         <button type="submit">log in</button>
       </form>
