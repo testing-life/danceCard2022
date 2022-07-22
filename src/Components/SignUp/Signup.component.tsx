@@ -1,11 +1,20 @@
 import React, { useState, FC } from 'react';
-import { addDoc, auth, createUserWithEmailAndPassword, db } from '../../Firebase/firebase';
+import {
+  addDoc,
+  auth,
+  createUserWithEmailAndPassword,
+  db,
+  query,
+  collection,
+  where,
+  updateDoc,
+  doc,
+} from '../../Firebase/firebase';
 import * as ROUTES from '../../Constants/routes';
 import { useForm } from 'react-hook-form';
 import { useGeo } from '../../Contexts/geolocation.context';
 import { Profile } from '../../Models/profile.models';
 import ErrorMessages from '../../Constants/errors';
-import { collection } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import { Collections } from '../../Constants/collections';
 
@@ -33,7 +42,11 @@ export const SignUpComponent: FC = () => {
       ...location,
     }).catch((error: Error) => setError(error.message));
     if (updateRes) {
-      navigate(ROUTES.LOG_IN);
+      const userRef = updateRes && doc(db, Collections.Users, updateRes.id);
+      if (userRef) {
+        await updateDoc(userRef, { docId: updateRes.id }).catch(e => setError(e.message));
+        navigate(ROUTES.LOG_IN);
+      }
     }
   };
 
