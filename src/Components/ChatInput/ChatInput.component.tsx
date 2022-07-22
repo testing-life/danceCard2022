@@ -27,13 +27,12 @@ const ChatInputComponent: FunctionComponent<Props> = ({ ...props }) => {
     if ((profile.chats as string[]).includes(chatID)) {
       return;
     }
-    const chats: string[] = Array.from(new Set([...profile.chats, chatID]));
     const userRef = doc(db, Collections.Users, profile.docId);
     const otherUserRef = doc(db, Collections.Users, targetUserDocID);
     //if target id === user.uid, cancel
     if (userRef && otherUserRef) {
-      await updateDoc(userRef, { chats }).catch(e => console.error(e.message));
-      await updateDoc(otherUserRef, { chats }).catch(e => console.error(e.message));
+      await updateDoc(userRef, { chats: arrayUnion(chatID) }).catch(e => setError(e.message));
+      await updateDoc(otherUserRef, { chats: arrayUnion(chatID) }).catch(e => setError(e.message));
     }
   };
 
