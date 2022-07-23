@@ -2,7 +2,6 @@ import React, { FC, useState, useEffect } from 'react';
 import { collection, db, onSnapshot, orderBy, query, where } from '../../Firebase/firebase';
 import ChatInputComponent from '../ChatInput/ChatInput.component';
 import './ChatsList.component.css';
-// import { useMsgNotification } from '../../Contexts/messageNotification.context';
 import { isObjectWithValue } from '../../Utils/object';
 import { Collections } from '../../Constants/collections';
 import { useProfile } from '../../Contexts/profile.context';

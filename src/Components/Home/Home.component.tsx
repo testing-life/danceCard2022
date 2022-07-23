@@ -1,15 +1,7 @@
 import React, { FunctionComponent, useEffect, useState, ChangeEvent } from 'react';
 import { getUsersInRadius, query, collection, db, where, onSnapshot, auth } from '../../Firebase/firebase';
 
-// import { LeafletMap } from '../Map/Map.component';
-// import { useGeo } from '../../Contexts/geolocation.context';
-// import Firebase from '../../Firebase/firebase';
-// import { GeoQuery, GeoQuerySnapshot } from 'geofirestore';
-// import { GeoFirestoreTypes } from 'geofirestore/dist/GeoFirestoreTypes';
-// import { LatLngLiteral } from 'leaflet';
-// import { useUser } from '../../Contexts/user.context';
-// import { useProfile } from '../../Contexts/profile.context';
-// import { Profile } from '../../Models/profile.models';
+import { useMsgNotification } from '../../Contexts/messageNotification.context';
 import { useGeo } from '../../Contexts/geolocation.context';
 import { DocumentData, QueryDocumentSnapshot } from 'firebase/firestore';
 import { LeafletMap } from '../Map/Map.component';
@@ -17,7 +9,6 @@ import { useProfile } from '../../Contexts/profile.context';
 import { RADIUS_IN_M } from '../../Constants/locatingParams';
 import { Collections } from '../../Constants/collections';
 import { useAuthState } from 'react-firebase-hooks/auth';
-import { updateObjArrayWithOtherArrayOfObj } from '../../Utils/object';
 
 export const HomeComponent: FunctionComponent<any> = () => {
   const { location, locationError } = useGeo();
@@ -26,6 +17,7 @@ export const HomeComponent: FunctionComponent<any> = () => {
   // const [error, setError] = useState<string>();
   const [localUsers, setLocalUsers] = useState<QueryDocumentSnapshot<DocumentData>[]>([]);
   const [radius, setRadius] = useState(RADIUS_IN_M);
+  const { askNotificationPermission } = useMsgNotification();
 
   const fetchLocalUsers = async (location: any) => {
     const snapshots = await getUsersInRadius([location.lat, location.lng], radius);
@@ -39,23 +31,21 @@ export const HomeComponent: FunctionComponent<any> = () => {
   const radiusSliderHandler = (e: ChangeEvent<HTMLInputElement>) => {
     setRadius(parseInt(e.target.value));
   };
-
-  const localUsersListener = () => {
-    const userQuery = query(collection(db, Collections.Users));
-
-    const unsubscribe = onSnapshot(userQuery, (querySnapshot: any) => {
-      const newLocalUsers: any[] = [];
-      querySnapshot.forEach((doc: any) => {
-        newLocalUsers.push(doc.data());
-      });
-      setLocalUsers(newLocalUsers);
-    });
-  };
-
   useEffect(() => {
+    let unsubscribe: any = null;
+
     if (user) {
-      localUsersListener();
+      const userQuery = query(collection(db, Collections.Users));
+
+      unsubscribe = onSnapshot(userQuery, (querySnapshot: any) => {
+        const newLocalUsers: any[] = [];
+        querySnapshot.forEach((doc: any) => {
+          newLocalUsers.push(doc.data());
+        });
+        setLocalUsers(newLocalUsers);
+      });
     }
+    return () => unsubscribe;
   }, [user]);
 
   useEffect(() => {
@@ -73,6 +63,12 @@ export const HomeComponent: FunctionComponent<any> = () => {
   return (
     <>
       <div className="row">
+        <div>
+          {Notification.permission === 'granted' ||
+            (Notification.permission === 'default' && (
+              <button onClick={askNotificationPermission}>Notification request</button>
+            ))}
+        </div>
         {profile && (
           <p className="column">
             {profile.username} is currently:{' '}

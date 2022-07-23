@@ -29,73 +29,76 @@ const ProfileFormComponent: FC = () => {
   return (
     <>
       {profile && (
-        <form onSubmit={onSubmit}>
-          <legend>Profile</legend>
-          <ul>
-            <li>
-              <label>
-                User name
-                <input
-                  type="text"
-                  defaultValue={profile.username}
-                  placeholder="username"
-                  name="username"
-                  onInput={(e: ChangeEvent<HTMLInputElement>) =>
-                    setFormData({ ...formData, [e.target.name]: e.target.value })
-                  }
-                />
-              </label>
-            </li>
-            <li>
-              <label>
-                Active
-                <input
-                  type="checkbox"
-                  defaultChecked={profile.active}
-                  name="active"
-                  onInput={(e: ChangeEvent<HTMLInputElement>) =>
-                    setFormData({ ...formData, [e.target.name]: e.target.checked })
-                  }
-                />
-              </label>
-            </li>
-            {!!Object.keys(profile).length &&
-              Object.entries(profile.dances).map((dance: any, index: number) => {
-                const danceName: DanceName = dance[0];
-                const positionsObj: Dance = dance[1];
-                return (
-                  <li key={index} className={`danceItem`}>
-                    <b className="">{danceName}</b>
-                    <div className="">
-                      <label htmlFor={`${danceName}-lead`}>
-                        <span>Lead</span>
-                        <input
-                          type="checkbox"
-                          name={danceName}
-                          onInput={(e: ChangeEvent<HTMLInputElement>) => updateDanceObj(e, 'lead')}
-                          id={`${danceName}-lead`}
-                          defaultChecked={positionsObj.lead}
-                        />
-                      </label>
-                    </div>
-                    <div className="">
-                      <label htmlFor={`${danceName}-follow`}>
-                        <span>Follow</span>
-                        <input
-                          type="checkbox"
-                          name={danceName}
-                          onInput={(e: ChangeEvent<HTMLInputElement>) => updateDanceObj(e, 'follow')}
-                          id={`${danceName}-follow`}
-                          defaultChecked={positionsObj.follow}
-                        />
-                      </label>
-                    </div>
-                  </li>
-                );
-              })}
-          </ul>
-          <button type="submit">Update</button>
-        </form>
+        <>
+          <div>Enable message notifications</div>
+          <form onSubmit={onSubmit}>
+            <legend>Profile</legend>
+            <ul>
+              <li>
+                <label>
+                  User name
+                  <input
+                    type="text"
+                    defaultValue={profile.username}
+                    placeholder="username"
+                    name="username"
+                    onInput={(e: ChangeEvent<HTMLInputElement>) =>
+                      setFormData({ ...formData, [e.target.name]: e.target.value })
+                    }
+                  />
+                </label>
+              </li>
+              <li>
+                <label>
+                  Active
+                  <input
+                    type="checkbox"
+                    defaultChecked={profile.active}
+                    name="active"
+                    onInput={(e: ChangeEvent<HTMLInputElement>) =>
+                      setFormData({ ...formData, [e.target.name]: e.target.checked })
+                    }
+                  />
+                </label>
+              </li>
+              {!!Object.keys(profile).length &&
+                Object.entries(profile.dances).map((dance: any, index: number) => {
+                  const danceName: DanceName = dance[0];
+                  const positionsObj: Dance = dance[1];
+                  return (
+                    <li key={index} className={`danceItem`}>
+                      <b className="">{danceName}</b>
+                      <div className="">
+                        <label htmlFor={`${danceName}-lead`}>
+                          <span>Lead</span>
+                          <input
+                            type="checkbox"
+                            name={danceName}
+                            onInput={(e: ChangeEvent<HTMLInputElement>) => updateDanceObj(e, 'lead')}
+                            id={`${danceName}-lead`}
+                            defaultChecked={positionsObj.lead}
+                          />
+                        </label>
+                      </div>
+                      <div className="">
+                        <label htmlFor={`${danceName}-follow`}>
+                          <span>Follow</span>
+                          <input
+                            type="checkbox"
+                            name={danceName}
+                            onInput={(e: ChangeEvent<HTMLInputElement>) => updateDanceObj(e, 'follow')}
+                            id={`${danceName}-follow`}
+                            defaultChecked={positionsObj.follow}
+                          />
+                        </label>
+                      </div>
+                    </li>
+                  );
+                })}
+            </ul>
+            <button type="submit">Update</button>
+          </form>
+        </>
       )}
       {profileError && <p>{profileError}</p>}
       {updating && <p>...updating</p>}
