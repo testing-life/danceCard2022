@@ -30,7 +30,6 @@ const ProfileFormComponent: FC = () => {
     <>
       {profile && (
         <>
-          <div>Enable message notifications</div>
           <form onSubmit={onSubmit}>
             <legend>Profile</legend>
             <ul>
@@ -44,19 +43,6 @@ const ProfileFormComponent: FC = () => {
                     name="username"
                     onInput={(e: ChangeEvent<HTMLInputElement>) =>
                       setFormData({ ...formData, [e.target.name]: e.target.value })
-                    }
-                  />
-                </label>
-              </li>
-              <li>
-                <label>
-                  Active
-                  <input
-                    type="checkbox"
-                    defaultChecked={profile.active}
-                    name="active"
-                    onInput={(e: ChangeEvent<HTMLInputElement>) =>
-                      setFormData({ ...formData, [e.target.name]: e.target.checked })
                     }
                   />
                 </label>

@@ -1,12 +1,12 @@
 import React, { FC, FunctionComponent } from 'react';
 import ProfileFormComponent from './Profile.form.component';
-import ProfileCredentialsChangeComponent from './Profile.credentialsChange.component';
+import PasswordReset from '../PasswordReset/PasswordReset.component';
 
 const Profile: FC = () => {
   return (
     <>
       <ProfileFormComponent />
-      {/* <ProfileCredentialsChangeComponent /> */}
+      <PasswordReset />
     </>
   );
 };
