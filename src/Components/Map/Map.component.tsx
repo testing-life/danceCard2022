@@ -1,16 +1,10 @@
-import React, { FC, useEffect, useState } from 'react';
+import React, { FC } from 'react';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
-// import { isObjectWithValue } from '../../Utils/object';
-// import CustomPopup from '../CustomPopup/CustomPopup.component';
-// import * as ROUTES from '../../Constants/routes';
-// import { Profile } from '../../Models/profile.models';
-import { MapContainer, TileLayer, useMap, Marker, Popup, Circle } from 'react-leaflet';
+import { MapContainer, TileLayer } from 'react-leaflet';
 import { DocumentData, QueryDocumentSnapshot } from 'firebase/firestore';
-import { auth } from '../../Firebase/firebase';
-import { useAuthState } from 'react-firebase-hooks/auth';
-import { useGeo } from '../../Contexts/geolocation.context';
 import { MapContent } from './MapContent.component.';
+import { useGeo } from '../../Contexts/geolocation.context';
 
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 
@@ -27,18 +21,25 @@ type Props = {
 };
 
 export const LeafletMap: FC<Props> = ({ localUsers, radius }) => {
+  const { location, locationError } = useGeo();
   return (
-    <MapContainer
-      style={{ width: '500px', height: '500px' }}
-      center={[49.1951, 16.6068]}
-      zoom={13}
-      scrollWheelZoom={false}
-    >
-      <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-      />
-      <MapContent localUsers={localUsers} radius={radius} />
-    </MapContainer>
+    <>
+      {!locationError?.message && location.lat && location.lng ? (
+        <MapContainer
+          style={{ width: '500px', height: '500px' }}
+          center={[location.lat, location.lng]}
+          zoom={13}
+          scrollWheelZoom={false}
+        >
+          <TileLayer
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          />
+          <MapContent localUsers={localUsers} radius={radius} />
+        </MapContainer>
+      ) : (
+        <p>loading map...</p>
+      )}
+    </>
   );
 };
