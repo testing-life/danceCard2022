@@ -5,6 +5,7 @@ import NavigationComponent from '../Components/Header/Navigation.component';
 import ChatInputComponent from '../Components/ChatInput/ChatInput.component';
 import { useLocation } from 'react-router-dom';
 import { MsgNotificationProvider } from '../Contexts/messageNotification.context';
+import HeaderComponent from '../Components/Header/Header.component';
 
 export const ChatsListPage = () => {
   const location = useLocation();
@@ -12,7 +13,7 @@ export const ChatsListPage = () => {
   return (
     <ProfileProvider>
       <MsgNotificationProvider>
-        <NavigationComponent />
+        <HeaderComponent />
         {location?.state ? <ChatInputComponent routeProps={location!.state} /> : null}
 
         <ChatsListComponent />

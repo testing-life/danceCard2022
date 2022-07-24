@@ -9,6 +9,7 @@ import { useProfile } from '../../Contexts/profile.context';
 import { RADIUS_IN_M } from '../../Constants/locatingParams';
 import { Collections } from '../../Constants/collections';
 import { useAuthState } from 'react-firebase-hooks/auth';
+import ErrorMessages from '../../Constants/errors';
 
 export const HomeComponent: FunctionComponent<any> = () => {
   const { location, locationError } = useGeo();
@@ -17,7 +18,6 @@ export const HomeComponent: FunctionComponent<any> = () => {
   // const [error, setError] = useState<string>();
   const [localUsers, setLocalUsers] = useState<QueryDocumentSnapshot<DocumentData>[]>([]);
   const [radius, setRadius] = useState(RADIUS_IN_M);
-  const { askNotificationPermission } = useMsgNotification();
 
   const fetchLocalUsers = async (location: any) => {
     const snapshots = await getUsersInRadius([location.lat, location.lng], radius);
@@ -63,12 +63,6 @@ export const HomeComponent: FunctionComponent<any> = () => {
   return (
     <>
       <div className="row">
-        <div>
-          {Notification.permission === 'granted' ||
-            (Notification.permission === 'default' && (
-              <button onClick={askNotificationPermission}>Notification request</button>
-            ))}
-        </div>
         {profile && (
           <p className="column">
             {profile.username} is currently:{' '}
@@ -91,7 +85,13 @@ export const HomeComponent: FunctionComponent<any> = () => {
           onChange={radiusSliderHandler}
         />
       </div>
-      {locationError && <p>{locationError.message}</p>}
+      {locationError && (
+        <p>
+          {locationError.code}
+          {locationError.message}
+          {ErrorMessages.get(locationError.code)}
+        </p>
+      )}
 
       <LeafletMap localUsers={localUsers} radius={radius} />
     </>

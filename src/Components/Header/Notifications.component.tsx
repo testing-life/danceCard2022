@@ -13,14 +13,6 @@ const NotificationComponent: FunctionComponent = () => {
   const isFromMe = lastMessageSenderId === profile?.uid ? true : false;
   const targetUserId = msg?.exists && msg?.data().members.filter((item: string) => item !== lastMessageSenderId);
 
-  useEffect(() => {
-    if (msg && !isFromMe) {
-      const img = 'https://www.iconsdb.com/icons/preview/white/edit-xxl.png';
-      const text = lastMessage.message;
-      const notification = new Notification('New Message', { body: text, icon: img });
-    }
-  }, [msg]);
-
   return (
     <>
       {lastMessage && !isFromMe ? (

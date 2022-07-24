@@ -7,7 +7,6 @@ import { useProfile } from './profile.context';
 type MsgNotificationConsumer = {
   msg: DocumentData;
   setMsg: (value: DocumentData | any) => any;
-  askNotificationPermission: () => void;
 };
 
 const MsgNotificationContext = React.createContext<MsgNotificationConsumer>({} as MsgNotificationConsumer);
@@ -43,28 +42,7 @@ export const MsgNotificationProvider = ({ ...props }: Props) => {
     return () => unsubscribe;
   }, [profile]);
 
-  const askNotificationPermission = async (): Promise<void> => {
-    if (!('Notification' in window)) {
-      console.log('No notifications support');
-    } else {
-      if (checkNotificationPromise()) {
-        await Notification.requestPermission();
-      } else {
-        Notification.requestPermission();
-      }
-    }
-  };
-
-  const checkNotificationPromise = () => {
-    try {
-      Notification.requestPermission().then();
-    } catch (e) {
-      return false;
-    }
-    return true;
-  };
-
-  return <MsgNotificationContext.Provider value={{ msg, setMsg, askNotificationPermission }} {...props} />;
+  return <MsgNotificationContext.Provider value={{ msg, setMsg }} {...props} />;
 };
 
 const { Consumer: MsgNotificationConsumer } = MsgNotificationContext;
