@@ -4,14 +4,16 @@ import './PasswordReset.component.css';
 
 const PasswordReset: FC = () => {
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
 
   const resetHandler = async (e: ChangeEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (error) {
-      setError('');
-    }
+    setError('');
+    setSuccess('');
     const address = (e.target[0] as HTMLInputElement).value;
-    await doPasswordReset(address).catch((e: Error) => setError(e.message));
+    await doPasswordReset(address)
+      .catch((e: Error) => setError(e.message))
+      .finally(() => setSuccess('Password reset email sent'));
   };
 
   return (
@@ -30,7 +32,8 @@ const PasswordReset: FC = () => {
         />
         <button type="submit">Reset password</button>
       </form>
-      {error ? <p>{error}</p> : <p>Password reset email sent</p>}
+      {error && <p>{error}</p>}
+      {!error && success && <p>{success}</p>}
     </>
   );
 };
