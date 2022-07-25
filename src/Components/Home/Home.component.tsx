@@ -1,7 +1,6 @@
 import React, { FunctionComponent, useEffect, useState, ChangeEvent } from 'react';
-import { getUsersInRadius, query, collection, db, where, onSnapshot, auth } from '../../Firebase/firebase';
+import { getUsersInRadius, query, collection, db, onSnapshot, auth } from '../../Firebase/firebase';
 
-import { useMsgNotification } from '../../Contexts/messageNotification.context';
 import { useGeo } from '../../Contexts/geolocation.context';
 import { DocumentData, QueryDocumentSnapshot } from 'firebase/firestore';
 import { LeafletMap } from '../Map/Map.component';
@@ -15,7 +14,6 @@ export const HomeComponent: FunctionComponent<any> = () => {
   const { location, locationError } = useGeo();
   const [user, loading, authError] = useAuthState(auth);
   const { profile, updateVisibilityInProfile } = useProfile();
-  // const [error, setError] = useState<string>();
   const [localUsers, setLocalUsers] = useState<QueryDocumentSnapshot<DocumentData>[]>([]);
   const [radius, setRadius] = useState(RADIUS_IN_M);
 

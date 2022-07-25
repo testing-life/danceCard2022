@@ -46,6 +46,8 @@ export const LoginComponent: FC = () => {
         <button type="submit">log in</button>
       </form>
       <Link to={ROUTES.SIGN_UP}>No account? Register.</Link>
+      <br />
+      <Link to={ROUTES.PASSWORD_RESET}>Forgot password? Reset.</Link>
     </div>
   );
 };
