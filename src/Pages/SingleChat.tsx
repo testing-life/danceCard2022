@@ -4,14 +4,15 @@ import SingleChatComponent from '../Components/SingleChat/SingleChat.component';
 import NavigationComponent from '../Components/Header/Navigation.component';
 import { useLocation } from 'react-router-dom';
 import { MsgNotificationProvider } from '../Contexts/messageNotification.context';
+import { ChatProps } from '../Components/ChatInput/ChatInput.component';
 
 export const SingleChatPage = () => {
-  const location = useLocation();
+  const { state } = useLocation();
   return (
     <ProfileProvider>
       <MsgNotificationProvider>
         <NavigationComponent />
-        <SingleChatComponent routeProps={location!.state} />
+        <SingleChatComponent routeProps={state as ChatProps} />
       </MsgNotificationProvider>
     </ProfileProvider>
   );

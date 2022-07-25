@@ -1,16 +1,21 @@
 import React, { FunctionComponent, useState, FormEvent, useEffect } from 'react';
 import { useProfile } from '../../Contexts/profile.context';
-import * as ROUTES from '../../Constants/routes';
-import { useNavigate } from 'react-router-dom';
 import { addDoc, collection, db, doc, updateDoc, arrayUnion } from '../../Firebase/firebase';
 import { Collections } from '../../Constants/collections';
 
+export interface ChatProps {
+  targetUserID: string;
+  existingChatID: string;
+  targetUsername: string;
+  targetUserDocID?: string;
+}
+
 type Props = {
-  routeProps: any;
+  routeProps: ChatProps;
 };
 
-const ChatInputComponent: FunctionComponent<Props> = ({ ...props }) => {
-  const { targetUserID, existingChatID, targetUsername, targetUserDocID } = props.routeProps;
+const ChatInputComponent: FunctionComponent<Props> = ({ routeProps }) => {
+  const { targetUserID, existingChatID, targetUsername, targetUserDocID } = routeProps;
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const [isSending, setIsSending] = useState(false);
@@ -28,7 +33,7 @@ const ChatInputComponent: FunctionComponent<Props> = ({ ...props }) => {
       return;
     }
     const userRef = doc(db, Collections.Users, profile.docId);
-    const otherUserRef = doc(db, Collections.Users, targetUserDocID);
+    const otherUserRef = targetUserDocID && doc(db, Collections.Users, targetUserDocID);
     //if target id === user.uid, cancel
     if (userRef && otherUserRef) {
       await updateDoc(userRef, { chats: arrayUnion(chatID) }).catch(e => setError(e.message));
