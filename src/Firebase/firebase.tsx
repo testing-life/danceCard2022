@@ -22,6 +22,7 @@ import {
   doc,
   onSnapshot,
   arrayUnion,
+  deleteDoc
 } from 'firebase/firestore';
 import { Collections } from '../Constants/collections';
 import * as geofire from 'geofire-common';
@@ -48,6 +49,10 @@ const doEmailRegistration = async (email: string, password: string) =>
 const doPasswordReset = async (email: string) => await sendPasswordResetEmail(auth, email);
 
 const doSignOut = async () => await signOut(auth);
+
+const doDeleteChat = async (docId:string):Promise<void> => {
+  return deleteDoc(doc(db, Collections.Chats, docId))
+ }
 
 const getUsersInRadius = async (
   location: [lat: number, lng: number],
@@ -96,4 +101,5 @@ export {
   createUserWithEmailAndPassword,
   getUsersInRadius,
   onSnapshot,
+  doDeleteChat
 };

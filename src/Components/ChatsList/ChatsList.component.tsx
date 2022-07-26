@@ -1,5 +1,5 @@
 import React, { FC, useState, useEffect } from 'react';
-import { collection, db, onSnapshot, orderBy, query, where } from '../../Firebase/firebase';
+import { collection, db, onSnapshot, orderBy, query, where,  doDeleteChat } from '../../Firebase/firebase';
 import ChatInputComponent from '../ChatInput/ChatInput.component';
 import './ChatsList.component.css';
 import { isObjectWithValue } from '../../Utils/object';
@@ -13,6 +13,7 @@ const ChatsListComponent: FC = () => {
   const { profile } = useProfile();
   // const { msg } = useMsgNotification();
   const [isFlashed, setIsFlashed] = useState(false);
+  const [deleteError, setDeleteError] = useState('');
   let unsubscribe: any = null;
 
   useEffect(() => {
@@ -39,6 +40,10 @@ const ChatsListComponent: FC = () => {
     });
   };
 
+const deleteChat = async (docId:string):Promise<void> => {
+  await doDeleteChat(docId).catch((e:Error)=> setDeleteError(e.message));
+}
+
   return (
     <>
       {!localChats?.length && <p>no chats</p>}
@@ -63,6 +68,8 @@ const ChatsListComponent: FC = () => {
                     hour: 'numeric',
                     minute: 'numeric',
                   })}
+                  <button onClick={()=> deleteChat(existingChatID)}>Delete chat</button>
+                  {deleteError && <p>{deleteError}</p>}
                 </summary>
                 {messages.map(
                   (
