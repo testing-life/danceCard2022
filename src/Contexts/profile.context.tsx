@@ -42,7 +42,7 @@ export const ProfileProvider = ({ ...props }: Props) => {
     const userQuery = query(collection(db, Collections.Users), where('uid', '==', user?.uid));
 
     const doc = await getDocs(userQuery).catch(e => setProfileError(e.message));
-    const profileData = doc ? ({ ...doc.docs[0].data(), docId: doc?.docs[0].id } as Profile) : null;
+    const profileData = doc?.docs.length ? ({ ...doc.docs[0].data(), docId: doc?.docs[0].id } as Profile) : null;
     return profileData;
   };
 

@@ -5,6 +5,12 @@ import {
   createUserWithEmailAndPassword,
   sendPasswordResetEmail,
   signOut,
+  deleteUser,
+  reauthenticateWithCredential,
+  UserCredential,
+  EmailAuthProvider,
+  AuthCredential,
+  EmailAuthCredential,
 } from 'firebase/auth';
 import {
   getFirestore,
@@ -22,7 +28,7 @@ import {
   doc,
   onSnapshot,
   arrayUnion,
-  deleteDoc
+  deleteDoc,
 } from 'firebase/firestore';
 import { Collections } from '../Constants/collections';
 import * as geofire from 'geofire-common';
@@ -50,9 +56,34 @@ const doPasswordReset = async (email: string) => await sendPasswordResetEmail(au
 
 const doSignOut = async () => await signOut(auth);
 
-const doDeleteChat = async (docId:string):Promise<void> => {
-  return deleteDoc(doc(db, Collections.Chats, docId))
- }
+const doDeleteChat = async (docId: string): Promise<void> => {
+  return deleteDoc(doc(db, Collections.Chats, docId));
+};
+
+const doDeleteProfile = async (docId: string): Promise<void> => {
+  return deleteDoc(doc(db, Collections.Users, docId));
+};
+
+const doDeleteUser = async (): Promise<void | null> => {
+  const user = auth.currentUser;
+  return user ? deleteUser(user) : null;
+};
+
+const getCredential = (password: string): EmailAuthCredential | undefined => {
+  if (!auth.currentUser?.email) {
+    return;
+  }
+  const userEmail = auth.currentUser?.email;
+  return EmailAuthProvider.credential(userEmail, password);
+};
+
+const doReauthenticate = async (credential: AuthCredential): Promise<UserCredential | undefined> => {
+  if (!auth.currentUser || !credential) {
+    return;
+  }
+  const user = auth.currentUser;
+  return reauthenticateWithCredential(user, credential);
+};
 
 const getUsersInRadius = async (
   location: [lat: number, lng: number],
@@ -101,5 +132,9 @@ export {
   createUserWithEmailAndPassword,
   getUsersInRadius,
   onSnapshot,
-  doDeleteChat
+  doDeleteChat,
+  doDeleteUser,
+  doDeleteProfile,
+  getCredential,
+  doReauthenticate,
 };
