@@ -1,6 +1,17 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { Profile } from '../Models/profile.models';
-import { auth, query, db, collection, getDocs, updateDoc, where, doc } from '../Firebase/firebase';
+import { BlockedUser, Profile } from '../Models/profile.models';
+import {
+  auth,
+  query,
+  db,
+  collection,
+  getDocs,
+  updateDoc,
+  where,
+  doc,
+  arrayUnion,
+  arrayRemove,
+} from '../Firebase/firebase';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { Collections } from '../Constants/collections';
 import * as geofire from 'geofire-common';
@@ -12,6 +23,7 @@ type ProfileConsumer = {
   updateProfile: (newProfile: Profile) => void;
   updateLocationInProfile: (newCoords: LatLngLiteral) => void;
   updateVisibilityInProfile: (isActive: boolean) => void;
+  toggleUserBlock: (direction: 'block' | 'unblock', userToBlock: BlockedUser) => void;
 };
 
 const ProfileContext = React.createContext<ProfileConsumer>({} as ProfileConsumer);
@@ -66,6 +78,16 @@ export const ProfileProvider = ({ ...props }: Props) => {
     }
   };
 
+  const toggleUserBlock = async (direction: 'block' | 'unblock', userToBlock: BlockedUser) => {
+    const userRef = profile && doc(db, Collections.Users, profile.docId);
+    if (userRef) {
+      await updateDoc(userRef, {
+        blockedUsers: direction === 'block' ? arrayUnion(userToBlock) : arrayRemove(userToBlock),
+      }).catch(e => setProfileError(e.message));
+      setLocalProfile();
+    }
+  };
+
   const updateVisibilityInProfile = async (isActive: boolean): Promise<void> => {
     const userRef = profile && doc(db, Collections.Users, profile.docId);
     if (userRef) {
@@ -76,7 +98,14 @@ export const ProfileProvider = ({ ...props }: Props) => {
 
   return (
     <ProfileContext.Provider
-      value={{ profile, updateProfile, profileError, updateLocationInProfile, updateVisibilityInProfile }}
+      value={{
+        profile,
+        updateProfile,
+        toggleUserBlock,
+        profileError,
+        updateLocationInProfile,
+        updateVisibilityInProfile,
+      }}
       {...props}
     />
   );

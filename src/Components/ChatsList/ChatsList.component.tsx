@@ -1,19 +1,21 @@
 import React, { FC, useState, useEffect } from 'react';
-import { collection, db, onSnapshot, orderBy, query, where,  doDeleteChat } from '../../Firebase/firebase';
+import { collection, db, onSnapshot, orderBy, query, where, doDeleteChat } from '../../Firebase/firebase';
 import ChatInputComponent from '../ChatInput/ChatInput.component';
 import './ChatsList.component.css';
 import { isObjectWithValue } from '../../Utils/object';
 import { Collections } from '../../Constants/collections';
 import { useProfile } from '../../Contexts/profile.context';
 import { sortChatsAsc } from '../../Utils/array';
+import { BlockedUser } from '../../Models/profile.models';
 
 const ChatsListComponent: FC = () => {
   // QueryDocumentSnapshot
   const [localChats, setLocalChats] = useState<any>();
-  const { profile } = useProfile();
+  const { profile, toggleUserBlock } = useProfile();
   // const { msg } = useMsgNotification();
   const [isFlashed, setIsFlashed] = useState(false);
   const [deleteError, setDeleteError] = useState('');
+  const [blockError, setBlockError] = useState('');
   let unsubscribe: any = null;
 
   useEffect(() => {
@@ -40,12 +42,25 @@ const ChatsListComponent: FC = () => {
     });
   };
 
-const deleteChat = async (docId:string):Promise<void> => {
-  await doDeleteChat(docId).catch((e:Error)=> setDeleteError(e.message));
-}
+  const deleteChat = async (docId: string): Promise<void> => {
+    await doDeleteChat(docId).catch((e: Error) => setDeleteError(e.message));
+  };
+
+  const toggleBlockUser = async (direction: 'block' | 'unblock', userToBlock: BlockedUser) =>
+    await toggleUserBlock(direction, userToBlock);
 
   return (
     <>
+      <h2>Blocked users</h2>
+      <ul>
+        {profile?.blockedUsers.map((item: BlockedUser) => (
+          <li>
+            <p>{item.username}</p>
+            <button onClick={() => toggleBlockUser('unblock', item)}>Unblock</button>
+          </li>
+        ))}
+      </ul>
+      {blockError && <p>{blockError}</p>}
       {!localChats?.length && <p>no chats</p>}
       {localChats?.map((item: any, index: number) => {
         const messages = isObjectWithValue(item, 'messages') ? item.messages.sort(sortChatsAsc) : undefined;
@@ -68,8 +83,10 @@ const deleteChat = async (docId:string):Promise<void> => {
                     hour: 'numeric',
                     minute: 'numeric',
                   })}
-                  <button onClick={()=> deleteChat(existingChatID)}>Delete chat</button>
-                  {deleteError && <p>{deleteError}</p>}
+                  <div>
+                    <button onClick={() => deleteChat(existingChatID)}>Delete chat</button>
+                    {deleteError && <p>{deleteError}</p>}
+                  </div>
                 </summary>
                 {messages.map(
                   (
@@ -89,6 +106,14 @@ const deleteChat = async (docId:string):Promise<void> => {
                 <ChatInputComponent
                   routeProps={{ targetUserID: targetUserID(), existingChatID, targetUsername: messages[0]?.toName }}
                 />
+                <div>
+                  <button
+                    onClick={() => toggleBlockUser('block', { username: messages[0]?.toName, uid: targetUserID() })}
+                  >
+                    Block User
+                  </button>
+                  {deleteError && <p>{deleteError}</p>}
+                </div>
               </details>
             ) : (
               <p>There may have been a chat here that got corrupted.</p>

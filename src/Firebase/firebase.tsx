@@ -29,10 +29,12 @@ import {
   onSnapshot,
   arrayUnion,
   deleteDoc,
+  arrayRemove,
 } from 'firebase/firestore';
 import { Collections } from '../Constants/collections';
 import * as geofire from 'geofire-common';
 import { RADIUS_IN_M } from '../Constants/locatingParams';
+import { BlockedUser } from '../Models/profile.models';
 
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_API_KEY,
@@ -117,6 +119,7 @@ export {
   auth,
   db,
   arrayUnion,
+  arrayRemove,
   orderBy,
   query,
   collection,
