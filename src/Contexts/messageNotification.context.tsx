@@ -1,7 +1,9 @@
 import { DocumentData } from '@firebase/firestore';
 import React, { useState, useContext, useEffect } from 'react';
 import { Collections } from '../Constants/collections';
-import { collection, db, onSnapshot, orderBy, query, where } from '../Firebase/firebase';
+import { collection, db, onSnapshot, query, where } from '../Firebase/firebase';
+import { Message } from '../Models/messages.model';
+import { BlockedUser } from '../Models/profile.models';
 import { useProfile } from './profile.context';
 
 type MsgNotificationConsumer = {
@@ -19,6 +21,13 @@ export const MsgNotificationProvider = ({ ...props }: Props) => {
   const { profile } = useProfile();
   const [msg, setMsg] = useState<MsgNotificationConsumer>({} as MsgNotificationConsumer);
 
+  const comesFromBlocked = (array: Message, blockedArray: BlockedUser[]): boolean | Message => {
+    if (!blockedArray.length) {
+      return array;
+    }
+    return blockedArray.some(item => array.members.includes(item.uid));
+  };
+
   useEffect(() => {
     let unsubscribe: any = null;
     if (profile?.uid) {
@@ -31,7 +40,10 @@ export const MsgNotificationProvider = ({ ...props }: Props) => {
       unsubscribe = onSnapshot(chatsQuery, (querySnapshot: any) => {
         querySnapshot.docChanges().forEach(({ doc }: DocumentData) => {
           if (doc?.data().hasOwnProperty('messages')) {
-            setMsg(doc);
+            const message = doc.data();
+            if (!comesFromBlocked(message, profile.blockedUsers)) {
+              setMsg(doc);
+            }
           }
         });
       });

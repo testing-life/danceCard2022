@@ -85,7 +85,10 @@ const ChatsListComponent: FC = () => {
                     className={isFlashed && index === 0 ? 'isFlashed' : ''}
                     onClick={() => isFlashed && index === 0 && setIsFlashed(false)}
                   >
-                    {messages[0]?.toName ? messages[0]?.toName : 'Mystery user'},
+                    {messages[0]?.toName && messages[0]?.fromName
+                      ? `from: ${messages[messages.length - 1]?.fromName} to:${messages[messages.length - 1]?.toName}`
+                      : 'Mystery user'}
+                    ,
                     {new Date(messages[0].timestamp).toLocaleDateString('en-GB', {
                       weekday: 'long',
                       year: 'numeric',
@@ -126,7 +129,9 @@ const ChatsListComponent: FC = () => {
                   />
                   <div>
                     <button
-                      onClick={() => toggleBlockUser('block', { username: messages[0]?.toName, uid: targetUserID() })}
+                      onClick={() =>
+                        toggleBlockUser('block', { username: messages[0]?.fromName, uid: targetUserID() })
+                      }
                     >
                       Block User
                     </button>
