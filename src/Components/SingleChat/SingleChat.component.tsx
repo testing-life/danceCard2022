@@ -2,10 +2,8 @@ import React, { FunctionComponent, useState, useEffect } from 'react';
 import { Collections } from '../../Constants/collections';
 import { useProfile } from '../../Contexts/profile.context';
 import { onSnapshot, doc, db } from '../../Firebase/firebase';
-import { sortMessagesDesc } from '../../Utils/array';
+import { sortChatsAsc } from '../../Utils/array';
 import ChatInputComponent from '../ChatInput/ChatInput.component';
-// import ChatInputComponent from '../ChatInput/ChatInput.component';
-// import { sortMessagesDesc } from '../../Utils/array';
 
 type Props = {
   routeProps?: any;
@@ -16,12 +14,8 @@ const SingleChatComponent: FunctionComponent<Props> = ({ ...props }) => {
   const [state, setState] = useState<any>();
   const { profile } = useProfile();
 
-  // const targetUserID = (array: string[]) =>
-  //   array.find((id: string) => id !== user.uid);
-
   useEffect(() => {
     const unsubscribe = onSnapshot(doc(db, Collections.Chats, targetChatID), doc => {
-      console.log('Current data: ', doc.data());
       setState(doc.data());
     });
 
@@ -29,9 +23,9 @@ const SingleChatComponent: FunctionComponent<Props> = ({ ...props }) => {
   }, []);
 
   return (
-    <div className="container">
+    <>
       {!state && <p>no chat</p>}
-      {state?.messages.sort(sortMessagesDesc).map((item: any, index: number) => {
+      {state?.messages.sort(sortChatsAsc).map((item: any, index: number) => {
         return (
           <div key={`${index}`} className={item.fromID === profile?.uid ? 'messageBoxFrom' : 'messageBoxTo'}>
             <strong> From: {item.fromName}</strong> <p>{item.message}</p>
@@ -43,10 +37,10 @@ const SingleChatComponent: FunctionComponent<Props> = ({ ...props }) => {
           targetUserID: targetUserID,
           targetUserDocID: targetUserDocID,
           targetUsername: targetUsername,
-          existingChatID: state?.id ? state?.id : null,
+          existingChatID: targetChatID,
         }}
       />
-    </div>
+    </>
   );
 };
 

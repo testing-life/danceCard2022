@@ -7,10 +7,10 @@ type Props = {
 };
 
 type keys = 'follow' | 'lead';
-
+// TODO  fix keys type
 const ProfilePopup: FC<Props> = ({ dances }: Props) => {
-  const following = getFilteredKeys<DanceMap, keys>(dances, 'follow');
-  const leading = getFilteredKeys<DanceMap, keys>(dances, 'lead');
+  const following = getFilteredKeys<DanceMap, any>(dances, 'follow');
+  const leading = getFilteredKeys<DanceMap, any>(dances, 'lead');
   return (
     <>
       <p>

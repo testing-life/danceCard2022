@@ -11,6 +11,7 @@ import { LoginPage } from './Pages/Login';
 import { SignUpPage } from './Pages/Signup';
 import { LandingPage } from './Pages/Landing';
 import PrivateRoute from './Components/PrivateRoute/PrivateRoute.component';
+import { PasswordResetPage } from './Pages/PasswordReset';
 
 const App = () => {
   return (
@@ -21,6 +22,7 @@ const App = () => {
             <Route index element={<LandingPage />} />
             <Route path={ROUTES.SIGN_UP} element={<SignUpPage />} />
             <Route path={ROUTES.LOG_IN} element={<LoginPage />} />
+            <Route path={ROUTES.PASSWORD_RESET} element={<PasswordResetPage />} />
             <Route
               path={ROUTES.HOME}
               element={

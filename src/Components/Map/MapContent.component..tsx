@@ -1,14 +1,12 @@
 import React, { FC, useEffect, useState } from 'react';
 import 'leaflet/dist/leaflet.css';
 import L, { LatLngLiteral } from 'leaflet';
-// import { isObjectWithValue } from '../../Utils/object';
 import * as ROUTES from '../../Constants/routes';
 import { TileLayer, useMap, Marker, Popup, Circle } from 'react-leaflet';
 import { DocumentData, QueryDocumentSnapshot } from 'firebase/firestore';
 import { auth } from '../../Firebase/firebase';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { useGeo } from '../../Contexts/geolocation.context';
-import { RADIUS_IN_M } from '../../Constants/locatingParams';
 import ProfilePopup from '../ProfilePopoup/ProfilePopup.component';
 import { useProfile } from '../../Contexts/profile.context';
 import './Map.component.css';

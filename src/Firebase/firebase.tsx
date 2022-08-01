@@ -5,6 +5,12 @@ import {
   createUserWithEmailAndPassword,
   sendPasswordResetEmail,
   signOut,
+  deleteUser,
+  reauthenticateWithCredential,
+  UserCredential,
+  EmailAuthProvider,
+  AuthCredential,
+  EmailAuthCredential,
 } from 'firebase/auth';
 import {
   getFirestore,
@@ -22,10 +28,13 @@ import {
   doc,
   onSnapshot,
   arrayUnion,
+  deleteDoc,
+  arrayRemove,
 } from 'firebase/firestore';
 import { Collections } from '../Constants/collections';
 import * as geofire from 'geofire-common';
 import { RADIUS_IN_M } from '../Constants/locatingParams';
+import { BlockedUser } from '../Models/profile.models';
 
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_API_KEY,
@@ -49,6 +58,35 @@ const doPasswordReset = async (email: string) => await sendPasswordResetEmail(au
 
 const doSignOut = async () => await signOut(auth);
 
+const doDeleteChat = async (docId: string): Promise<void> => {
+  return deleteDoc(doc(db, Collections.Chats, docId));
+};
+
+const doDeleteProfile = async (docId: string): Promise<void> => {
+  return deleteDoc(doc(db, Collections.Users, docId));
+};
+
+const doDeleteUser = async (): Promise<void | null> => {
+  const user = auth.currentUser;
+  return user ? deleteUser(user) : null;
+};
+
+const getCredential = (password: string): EmailAuthCredential | undefined => {
+  if (!auth.currentUser?.email) {
+    return;
+  }
+  const userEmail = auth.currentUser?.email;
+  return EmailAuthProvider.credential(userEmail, password);
+};
+
+const doReauthenticate = async (credential: AuthCredential): Promise<UserCredential | undefined> => {
+  if (!auth.currentUser || !credential) {
+    return;
+  }
+  const user = auth.currentUser;
+  return reauthenticateWithCredential(user, credential);
+};
+
 const getUsersInRadius = async (
   location: [lat: number, lng: number],
   radiusInM: number = RADIUS_IN_M,
@@ -63,7 +101,6 @@ const getUsersInRadius = async (
   const snapshots = await Promise.all(promises).catch((e: Error) => console.error(e));
   if (snapshots) {
     for (const snap of snapshots) {
-      // console.log('snap.docs[0].data()', snap.docs[0].data());
       for (const doc of snap.docs) {
         const lat = doc.get('lat');
         const lng = doc.get('lng');
@@ -82,6 +119,7 @@ export {
   auth,
   db,
   arrayUnion,
+  arrayRemove,
   orderBy,
   query,
   collection,
@@ -97,11 +135,9 @@ export {
   createUserWithEmailAndPassword,
   getUsersInRadius,
   onSnapshot,
+  doDeleteChat,
+  doDeleteUser,
+  doDeleteProfile,
+  getCredential,
+  doReauthenticate,
 };
-
-//   getCurrentUser = () => this.auth.currentUser;
-//   getUsers = (): GeoCollectionReference => this.geofirestore.collection(Collections.Users);
-//   getChats = () => this.firestore.collection(Collections.Chats);
-//   getGeoPoint = (latitude: number, longitude: number) => new this.firestoreRef.GeoPoint(latitude, longitude);
-// }
-// export default Firebase;
