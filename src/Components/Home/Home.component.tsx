@@ -58,9 +58,42 @@ export const HomeComponent: FunctionComponent<any> = () => {
     }
   };
 
+  const askNotificationPermission = () => {
+    // function to actually ask the permissions
+    function handlePermission(permission: any) {
+      console.log('permission', permission);
+      // set the button to shown or hidden, depending on what the user answers
+      // notificationBtn.style.display = Notification.permission === 'granted' ? 'none' : 'block';
+    }
+
+    // Let's check if the browser supports notifications
+    if (!('Notification' in window)) {
+      console.log('This browser does not support notifications.');
+    } else if (checkNotificationPromise()) {
+      Notification.requestPermission().then(permission => {
+        handlePermission(permission);
+      });
+    } else {
+      Notification.requestPermission(permission => {
+        handlePermission(permission);
+      });
+    }
+  };
+
+  const checkNotificationPromise = () => {
+    try {
+      Notification.requestPermission().then();
+    } catch (e) {
+      return false;
+    }
+
+    return true;
+  };
+
   return (
     <>
       <div className="row">
+        <button onClick={askNotificationPermission}>Allow notifications</button>
         {profile && (
           <p className="column">
             {profile.username} is currently:{' '}

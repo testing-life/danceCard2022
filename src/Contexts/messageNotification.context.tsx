@@ -19,13 +19,15 @@ type Props = {
 
 export const MsgNotificationProvider = ({ ...props }: Props) => {
   const { profile } = useProfile();
-  const [msg, setMsg] = useState<MsgNotificationConsumer>({} as MsgNotificationConsumer);
+  const [msg, setMsg] = useState<Message>({} as Message);
+  const [localMsg, setLocalMsg] = useState<Message>({} as Message);
 
-  const comesFromBlocked = (array: Message, blockedArray: BlockedUser[]): boolean | Message => {
+  const comesFromBlocked = (array: Message, blockedArray: BlockedUser[]): any => {
     if (!blockedArray.length) {
-      return array;
+      return false;
     }
-    return blockedArray.some(item => array.members.includes(item.uid));
+    return blockedArray.find(item => array.members.includes(item.uid));
+    // return blockedArray.every(item => array.members.includes(item.uid));
   };
 
   useEffect(() => {
@@ -41,9 +43,7 @@ export const MsgNotificationProvider = ({ ...props }: Props) => {
         querySnapshot.docChanges().forEach(({ doc }: DocumentData) => {
           if (doc?.data().hasOwnProperty('messages')) {
             const message = doc.data();
-            if (!comesFromBlocked(message, profile.blockedUsers)) {
-              setMsg(doc);
-            }
+            setLocalMsg(message);
           }
         });
       });
@@ -53,6 +53,15 @@ export const MsgNotificationProvider = ({ ...props }: Props) => {
 
     return () => unsubscribe;
   }, [profile]);
+
+  useEffect(() => {
+    if (localMsg && profile) {
+      const isOriginBlocked = comesFromBlocked(localMsg, profile!.blockedUsers);
+      if (!isOriginBlocked) {
+        setMsg(localMsg);
+      }
+    }
+  }, [localMsg]);
 
   return <MsgNotificationContext.Provider value={{ msg, setMsg }} {...props} />;
 };

@@ -12,6 +12,13 @@ const NotificationComponent: FunctionComponent = () => {
   const lastMessageSenderId: string = lastMessage?.fromID;
   const isFromMe = lastMessageSenderId === profile?.uid ? true : false;
   const targetUserId = msg?.exists && msg?.data().members.filter((item: string) => item !== lastMessageSenderId);
+  useEffect(() => {
+    if (lastMessage && !isFromMe) {
+      // const img = '/to-do-notifications/img/icon-128.png';
+      const text = lastMessage.message;
+      const notification = new Notification('New message', { body: text });
+    }
+  }, [msg]);
 
   return (
     <>
