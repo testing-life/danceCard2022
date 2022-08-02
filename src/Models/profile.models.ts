@@ -17,11 +17,13 @@ export type IProfile = {
   uid: string;
   blockedUsers: BlockedUser[];
   username: string;
+  blockedBy: string[];
 };
 
 export class Profile implements IProfile {
   active = true;
   chats = [];
+  blockedBy = [];
   blockedUsers = [];
   dances = Dances;
   docId = '';

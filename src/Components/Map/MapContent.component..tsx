@@ -3,7 +3,7 @@ import 'leaflet/dist/leaflet.css';
 import L, { LatLngLiteral } from 'leaflet';
 import * as ROUTES from '../../Constants/routes';
 import { TileLayer, useMap, Marker, Popup, Circle } from 'react-leaflet';
-import { DocumentData, QueryDocumentSnapshot } from 'firebase/firestore';
+import { DocumentData } from 'firebase/firestore';
 import { auth } from '../../Firebase/firebase';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { useGeo } from '../../Contexts/geolocation.context';
@@ -11,6 +11,7 @@ import ProfilePopup from '../ProfilePopoup/ProfilePopup.component';
 import { useProfile } from '../../Contexts/profile.context';
 import './Map.component.css';
 import { Link } from 'react-router-dom';
+import { BlockedUser, Profile } from '../../Models/profile.models';
 
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 
@@ -21,7 +22,7 @@ L.Icon.Default.mergeOptions({
 });
 
 type Props = {
-  localUsers: QueryDocumentSnapshot<DocumentData>[];
+  localUsers: Profile[];
   radius: number;
   userActive?: boolean;
 };
@@ -29,7 +30,7 @@ type Props = {
 export const MapContent: FC<Props> = ({ localUsers, radius }) => {
   const [user] = useAuthState(auth);
   const map = useMap();
-  const { profile, updateLocationInProfile } = useProfile();
+  const { profile, updateLocationInProfile, toggleUserBlock } = useProfile();
   const [position, setPosition] = useState<LatLngLiteral>();
   const { updateLocation } = useGeo();
 
@@ -45,13 +46,15 @@ export const MapContent: FC<Props> = ({ localUsers, radius }) => {
     const updateLocation = (position: LatLngLiteral) => {
       updateLocationInProfile(position);
     };
-
     if (position && profile) {
       updateLocation(position);
     }
   }, [position]);
 
   const userIcon = L.divIcon({ className: 'my-div-icon', iconSize: [30, 30] });
+
+  const toggleBlockUser = async (direction: 'block' | 'unblock', blockedById: string, userToBlockDocId: string) =>
+    await toggleUserBlock(direction, blockedById, userToBlockDocId);
 
   const UserLocationMarker = () => {
     return position === undefined ? null : (
@@ -71,26 +74,40 @@ export const MapContent: FC<Props> = ({ localUsers, radius }) => {
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
       <UserLocationMarker />
-      {localUsers?.map((otherUser: any) => {
-        return user?.uid !== otherUser.uid && otherUser.active ? (
-          <Marker key={otherUser.uid} position={[otherUser.lat, otherUser.lng]}>
-            <Popup>
-              {otherUser.username}
-              <ProfilePopup dances={otherUser.dances} />
-              <Link
-                to={ROUTES.CHATS}
-                state={{
-                  targetUserDocID: otherUser.docId,
-                  targetUserID: otherUser.uid,
-                  targetUsername: otherUser.username,
-                }}
-              >
-                Message
-              </Link>
-            </Popup>
-          </Marker>
-        ) : null;
-      })}
+      {profile &&
+        localUsers
+          ?.filter((otherUser: Profile) => !(profile.blockedBy as string[]).includes(otherUser.uid))
+          .map((otherUser: Profile) => {
+            return user?.uid !== otherUser.uid && otherUser.active ? (
+              <Marker key={otherUser.uid} position={[otherUser.lat, otherUser.lng]}>
+                <Popup>
+                  <>
+                    {otherUser.username}
+                    <ProfilePopup dances={otherUser.dances} />
+                    {(otherUser.blockedBy as string[]).includes(profile.uid) ? (
+                      <button onClick={() => toggleBlockUser('unblock', profile.uid, otherUser.docId)}>
+                        Unblock User
+                      </button>
+                    ) : (
+                      <button onClick={() => toggleBlockUser('block', profile.uid, otherUser.docId)}>
+                        Block User
+                      </button>
+                    )}
+                    <Link
+                      to={ROUTES.CHATS}
+                      state={{
+                        targetUserDocID: otherUser.docId,
+                        targetUserID: otherUser.uid,
+                        targetUsername: otherUser.username,
+                      }}
+                    >
+                      Message
+                    </Link>
+                  </>
+                </Popup>
+              </Marker>
+            ) : null;
+          })}
     </>
   );
 };

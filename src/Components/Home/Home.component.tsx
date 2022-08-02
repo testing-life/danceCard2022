@@ -9,12 +9,13 @@ import { RADIUS_IN_M } from '../../Constants/locatingParams';
 import { Collections } from '../../Constants/collections';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import ErrorMessages from '../../Constants/errors';
+import { Profile } from '../../Models/profile.models';
 
 export const HomeComponent: FunctionComponent<any> = () => {
   const { location, locationError } = useGeo();
   const [user, loading, authError] = useAuthState(auth);
   const { profile, updateVisibilityInProfile } = useProfile();
-  const [localUsers, setLocalUsers] = useState<QueryDocumentSnapshot<DocumentData>[]>([]);
+  const [localUsers, setLocalUsers] = useState<Profile[]>([]);
   const [radius, setRadius] = useState(RADIUS_IN_M);
 
   const fetchLocalUsers = async (location: any) => {

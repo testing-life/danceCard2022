@@ -8,7 +8,7 @@ import { useProfile } from './profile.context';
 
 type MsgNotificationConsumer = {
   msg: DocumentData;
-  setMsg: (value: DocumentData | any) => any;
+  setMsg: (value: DocumentData) => any;
 };
 
 const MsgNotificationContext = React.createContext<MsgNotificationConsumer>({} as MsgNotificationConsumer);
@@ -19,15 +19,14 @@ type Props = {
 
 export const MsgNotificationProvider = ({ ...props }: Props) => {
   const { profile } = useProfile();
-  const [msg, setMsg] = useState<MsgNotificationConsumer>({} as MsgNotificationConsumer);
-  const [localMsg, setLocalMsg] = useState<DocumentData>({} as MsgNotificationConsumer);
+  const [msg, setMsg] = useState<DocumentData>({});
+  const [localMsg, setLocalMsg] = useState<DocumentData>();
 
-  const comesFromBlocked = (array: Message, blockedArray: BlockedUser[]): any => {
+  const comesFromBlocked = (message: Message, blockedArray: string[]): any => {
     if (!blockedArray.length) {
       return false;
     }
-    return blockedArray.find(item => array.members.includes(item.uid));
-    // return blockedArray.every(item => array.members.includes(item.uid));
+    return message.members.some((item: string) => blockedArray.includes(item));
   };
 
   useEffect(() => {
@@ -56,10 +55,11 @@ export const MsgNotificationProvider = ({ ...props }: Props) => {
   useEffect(() => {
     if (localMsg && profile) {
       const message: Message = localMsg.data();
-      const isOriginBlocked = comesFromBlocked(message, profile!.blockedUsers);
-      if (!isOriginBlocked) {
-        setMsg(localMsg as MsgNotificationConsumer);
-      }
+      const isOriginBlocked = comesFromBlocked(message, profile!.blockedBy);
+      console.log('isOriginBlocked', isOriginBlocked);
+      // if (!isOriginBlocked) {
+      setMsg(localMsg);
+      // }
     }
   }, [localMsg]);
 

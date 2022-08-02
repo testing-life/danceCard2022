@@ -12,7 +12,7 @@ import { Message } from '../../Models/messages.model';
 const ChatsListComponent: FC = () => {
   // QueryDocumentSnapshot
   const [localChats, setLocalChats] = useState<Message[]>([]);
-  const { profile, toggleUserBlock } = useProfile();
+  const { profile } = useProfile();
   // const { msg } = useMsgNotification();
   const [isFlashed, setIsFlashed] = useState(false);
   const [deleteError, setDeleteError] = useState('');
@@ -43,21 +43,18 @@ const ChatsListComponent: FC = () => {
     });
   };
 
-  const filterBlocked = (array: Message[], blockedArray: BlockedUser[]): Message[] | [] => {
-    if (!blockedArray.length) {
-      return array;
-    }
-    return array.filter((item: Message) =>
-      blockedArray.every((blockedItem: BlockedUser) => !item.members.includes(blockedItem.uid)),
-    );
-  };
+  // const filterBlocked = (array: Message[], blockedArray: BlockedUser[]): Message[] | [] => {
+  //   if (!blockedArray.length) {
+  //     return array;
+  //   }
+  //   return array.filter((item: Message) =>
+  //     blockedArray.every((blockedItem: BlockedUser) => !item.members.includes(blockedItem.uid)),
+  //   );
+  // };
 
   const deleteChat = async (docId: string): Promise<void> => {
     await doDeleteChat(docId).catch((e: Error) => setDeleteError(e.message));
   };
-
-  const toggleBlockUser = async (direction: 'block' | 'unblock', userToBlock: BlockedUser) =>
-    await toggleUserBlock(direction, userToBlock);
 
   return (
     <>
@@ -66,14 +63,13 @@ const ChatsListComponent: FC = () => {
         {profile?.blockedUsers.map((item: BlockedUser) => (
           <li>
             <p>{item.username}</p>
-            <button onClick={() => toggleBlockUser('unblock', item)}>Unblock</button>
           </li>
         ))}
       </ul>
       {blockError && <p>{blockError}</p>}
       {!localChats?.length && <p>no chats</p>}
       {localChats.length &&
-        filterBlocked(localChats, profile!.blockedUsers).map((item: any, index: number) => {
+        localChats.map((item: any, index: number) => {
           const messages = isObjectWithValue(item, 'messages') ? item.messages.sort(sortChatsAsc) : undefined;
           const existingChatID: string = item.docId;
           const targetUserID = () => item.members.find((id: string) => id !== profile!.uid);
@@ -127,16 +123,7 @@ const ChatsListComponent: FC = () => {
                       targetUsername: messages[0]?.toName,
                     }}
                   />
-                  <div>
-                    <button
-                      onClick={() =>
-                        toggleBlockUser('block', { username: messages[0]?.fromName, uid: targetUserID() })
-                      }
-                    >
-                      Block User
-                    </button>
-                    {deleteError && <p>{deleteError}</p>}
-                  </div>
+                  <div>{deleteError && <p>{deleteError}</p>}</div>
                 </details>
               ) : (
                 <p>There may have been a chat here that got corrupted.</p>

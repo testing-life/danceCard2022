@@ -5,6 +5,7 @@ import { MapContainer, TileLayer } from 'react-leaflet';
 import { DocumentData, QueryDocumentSnapshot } from 'firebase/firestore';
 import { MapContent } from './MapContent.component.';
 import { useGeo } from '../../Contexts/geolocation.context';
+import { Profile } from '../../Models/profile.models';
 
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 
@@ -15,7 +16,7 @@ L.Icon.Default.mergeOptions({
 });
 
 type Props = {
-  localUsers: QueryDocumentSnapshot<DocumentData>[];
+  localUsers: Profile[];
   radius: number;
   userActive?: boolean;
 };
