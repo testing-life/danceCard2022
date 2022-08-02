@@ -19,8 +19,8 @@ type Props = {
 
 export const MsgNotificationProvider = ({ ...props }: Props) => {
   const { profile } = useProfile();
-  const [msg, setMsg] = useState<Message>({} as Message);
-  const [localMsg, setLocalMsg] = useState<Message>({} as Message);
+  const [msg, setMsg] = useState<MsgNotificationConsumer>({} as MsgNotificationConsumer);
+  const [localMsg, setLocalMsg] = useState<DocumentData>({} as MsgNotificationConsumer);
 
   const comesFromBlocked = (array: Message, blockedArray: BlockedUser[]): any => {
     if (!blockedArray.length) {
@@ -42,8 +42,7 @@ export const MsgNotificationProvider = ({ ...props }: Props) => {
       unsubscribe = onSnapshot(chatsQuery, (querySnapshot: any) => {
         querySnapshot.docChanges().forEach(({ doc }: DocumentData) => {
           if (doc?.data().hasOwnProperty('messages')) {
-            const message = doc.data();
-            setLocalMsg(message);
+            setLocalMsg(doc);
           }
         });
       });
@@ -56,9 +55,10 @@ export const MsgNotificationProvider = ({ ...props }: Props) => {
 
   useEffect(() => {
     if (localMsg && profile) {
-      const isOriginBlocked = comesFromBlocked(localMsg, profile!.blockedUsers);
+      const message: Message = localMsg.data();
+      const isOriginBlocked = comesFromBlocked(message, profile!.blockedUsers);
       if (!isOriginBlocked) {
-        setMsg(localMsg);
+        setMsg(localMsg as MsgNotificationConsumer);
       }
     }
   }, [localMsg]);
