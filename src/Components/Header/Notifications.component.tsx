@@ -16,7 +16,11 @@ const NotificationComponent: FunctionComponent = () => {
     if (lastMessage && !isFromMe) {
       // const img = '/to-do-notifications/img/icon-128.png';
       const text = lastMessage.message;
-      const notification = new Notification('New message', { body: text });
+      try {
+        new Notification('New message', { body: text, tag: 'message' });
+      } catch (error) {
+        console.log('error', error);
+      }
     }
   }, [msg]);
 

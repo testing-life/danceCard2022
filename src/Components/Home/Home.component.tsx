@@ -2,7 +2,6 @@ import React, { FunctionComponent, useEffect, useState, ChangeEvent } from 'reac
 import { getUsersInRadius, query, collection, db, onSnapshot, auth } from '../../Firebase/firebase';
 
 import { useGeo } from '../../Contexts/geolocation.context';
-import { DocumentData, QueryDocumentSnapshot } from 'firebase/firestore';
 import { LeafletMap } from '../Map/Map.component';
 import { useProfile } from '../../Contexts/profile.context';
 import { RADIUS_IN_M } from '../../Constants/locatingParams';
@@ -95,7 +94,7 @@ export const HomeComponent: FunctionComponent<any> = () => {
   return (
     <>
       <div className="row">
-        {notificationPermission && <button onClick={askNotificationPermission}>Allow notifications</button>}
+        {!notificationPermission && <button onClick={askNotificationPermission}>Allow notifications</button>}
         {profile && (
           <p className="column">
             {profile.username} is currently:{' '}
