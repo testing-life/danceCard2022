@@ -17,6 +17,7 @@ export const HomeComponent: FunctionComponent<any> = () => {
   const { profile, updateVisibilityInProfile } = useProfile();
   const [localUsers, setLocalUsers] = useState<Profile[]>([]);
   const [radius, setRadius] = useState(RADIUS_IN_M);
+  const [notificationPermission, setNotificationPermission] = useState(false);
 
   const fetchLocalUsers = async (location: any) => {
     const snapshots = await getUsersInRadius([location.lat, location.lng], radius);
@@ -64,7 +65,7 @@ export const HomeComponent: FunctionComponent<any> = () => {
     function handlePermission(permission: any) {
       console.log('permission', permission);
       // set the button to shown or hidden, depending on what the user answers
-      // notificationBtn.style.display = Notification.permission === 'granted' ? 'none' : 'block';
+      Notification.permission === 'granted' ? setNotificationPermission(true) : setNotificationPermission(false);
     }
 
     // Let's check if the browser supports notifications
@@ -94,7 +95,7 @@ export const HomeComponent: FunctionComponent<any> = () => {
   return (
     <>
       <div className="row">
-        <button onClick={askNotificationPermission}>Allow notifications</button>
+        {notificationPermission && <button onClick={askNotificationPermission}>Allow notifications</button>}
         {profile && (
           <p className="column">
             {profile.username} is currently:{' '}

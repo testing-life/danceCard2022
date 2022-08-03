@@ -43,15 +43,6 @@ const ChatsListComponent: FC = () => {
     });
   };
 
-  // const filterBlocked = (array: Message[], blockedArray: BlockedUser[]): Message[] | [] => {
-  //   if (!blockedArray.length) {
-  //     return array;
-  //   }
-  //   return array.filter((item: Message) =>
-  //     blockedArray.every((blockedItem: BlockedUser) => !item.members.includes(blockedItem.uid)),
-  //   );
-  // };
-
   const deleteChat = async (docId: string): Promise<void> => {
     await doDeleteChat(docId).catch((e: Error) => setDeleteError(e.message));
   };

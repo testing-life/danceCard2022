@@ -2,7 +2,6 @@ import React, { FC } from 'react';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import { MapContainer, TileLayer } from 'react-leaflet';
-import { DocumentData, QueryDocumentSnapshot } from 'firebase/firestore';
 import { MapContent } from './MapContent.component.';
 import { useGeo } from '../../Contexts/geolocation.context';
 import { Profile } from '../../Models/profile.models';

@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { BlockedUser, Profile } from '../Models/profile.models';
+import { Profile } from '../Models/profile.models';
 import {
   auth,
   query,
@@ -14,11 +14,9 @@ import {
   onSnapshot,
 } from '../Firebase/firebase';
 import { useAuthState } from 'react-firebase-hooks/auth';
-import { useCollection } from 'react-firebase-hooks/firestore';
 import { Collections } from '../Constants/collections';
 import * as geofire from 'geofire-common';
 import { LatLngLiteral } from 'leaflet';
-import { DocumentData } from '@firebase/firestore';
 
 type ProfileConsumer = {
   profile: Profile | undefined;
@@ -26,7 +24,12 @@ type ProfileConsumer = {
   updateProfile: (newProfile: Profile) => void;
   updateLocationInProfile: (newCoords: LatLngLiteral) => void;
   updateVisibilityInProfile: (isActive: boolean) => void;
-  toggleUserBlock: (direction: 'block' | 'unblock', blockedById: string, userToBlockDocId: string) => void;
+  toggleUserBlock: (
+    direction: 'block' | 'unblock',
+    blockedById: string,
+    userToBlockDocId: string,
+    userToBlockId: string,
+  ) => void;
 };
 
 const ProfileContext = React.createContext<ProfileConsumer>({} as ProfileConsumer);
@@ -79,7 +82,6 @@ export const ProfileProvider = ({ ...props }: Props) => {
     const userRef = profile && doc(db, Collections.Users, profile.docId);
     if (userRef) {
       await updateDoc(userRef, newProfile).catch(e => setProfileError(e.message));
-      // setLocalProfile();
     }
   };
 
@@ -94,12 +96,21 @@ export const ProfileProvider = ({ ...props }: Props) => {
     }
   };
 
-  const toggleUserBlock = async (direction: 'block' | 'unblock', blockedById: string, userToBlockDocId: string) => {
+  const toggleUserBlock = async (
+    direction: 'block' | 'unblock',
+    blockedById: string,
+    userToBlockDocId: string,
+    userToBlockId: string,
+  ) => {
     const userToBeBlockedRef = profile && doc(db, Collections.Users, userToBlockDocId);
-    // updateboth profiles, blockedBy and blockedUsers - to block incoming messages fro mblocked user
-    if (userToBeBlockedRef) {
+    const userRef = profile && doc(db, Collections.Users, profile.docId);
+
+    if (userToBeBlockedRef && userRef) {
       await updateDoc(userToBeBlockedRef, {
         blockedBy: direction === 'block' ? arrayUnion(blockedById) : arrayRemove(blockedById),
+      }).catch(e => console.error(e.message));
+      await updateDoc(userRef, {
+        blockedUsers: direction === 'block' ? arrayUnion(userToBlockId) : arrayRemove(userToBlockId),
       }).catch(e => console.error(e.message));
     }
   };
@@ -108,7 +119,6 @@ export const ProfileProvider = ({ ...props }: Props) => {
     const userRef = profile && doc(db, Collections.Users, profile.docId);
     if (userRef) {
       await updateDoc(userRef, { active: isActive }).catch(e => setProfileError(e.message));
-      // setLocalProfile();
     }
   };
 

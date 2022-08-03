@@ -53,8 +53,12 @@ export const MapContent: FC<Props> = ({ localUsers, radius }) => {
 
   const userIcon = L.divIcon({ className: 'my-div-icon', iconSize: [30, 30] });
 
-  const toggleBlockUser = async (direction: 'block' | 'unblock', blockedById: string, userToBlockDocId: string) =>
-    await toggleUserBlock(direction, blockedById, userToBlockDocId);
+  const toggleBlockUser = async (
+    direction: 'block' | 'unblock',
+    blockedById: string,
+    userToBlockDocId: string,
+    userToBlockUid: string,
+  ) => await toggleUserBlock(direction, blockedById, userToBlockDocId, userToBlockUid);
 
   const UserLocationMarker = () => {
     return position === undefined ? null : (
@@ -85,11 +89,11 @@ export const MapContent: FC<Props> = ({ localUsers, radius }) => {
                     {otherUser.username}
                     <ProfilePopup dances={otherUser.dances} />
                     {(otherUser.blockedBy as string[]).includes(profile.uid) ? (
-                      <button onClick={() => toggleBlockUser('unblock', profile.uid, otherUser.docId)}>
+                      <button onClick={() => toggleBlockUser('unblock', profile.uid, otherUser.docId, otherUser.uid)}>
                         Unblock User
                       </button>
                     ) : (
-                      <button onClick={() => toggleBlockUser('block', profile.uid, otherUser.docId)}>
+                      <button onClick={() => toggleBlockUser('block', profile.uid, otherUser.docId, otherUser.uid)}>
                         Block User
                       </button>
                     )}

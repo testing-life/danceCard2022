@@ -55,11 +55,10 @@ export const MsgNotificationProvider = ({ ...props }: Props) => {
   useEffect(() => {
     if (localMsg && profile) {
       const message: Message = localMsg.data();
-      const isOriginBlocked = comesFromBlocked(message, profile!.blockedBy);
-      console.log('isOriginBlocked', isOriginBlocked);
-      // if (!isOriginBlocked) {
-      setMsg(localMsg);
-      // }
+      const isOriginBlocked = comesFromBlocked(message, profile!.blockedUsers);
+      if (!isOriginBlocked) {
+        setMsg(localMsg);
+      }
     }
   }, [localMsg]);
 
