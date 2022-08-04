@@ -3,7 +3,6 @@ import React, { useState, useContext, useEffect } from 'react';
 import { Collections } from '../Constants/collections';
 import { collection, db, onSnapshot, query, where } from '../Firebase/firebase';
 import { Message } from '../Models/messages.model';
-import { BlockedUser } from '../Models/profile.models';
 import { useProfile } from './profile.context';
 
 type MsgNotificationConsumer = {

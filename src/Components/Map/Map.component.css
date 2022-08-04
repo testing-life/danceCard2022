@@ -5,3 +5,12 @@
   height: 150px;
   box-shadow: 0 0 5px 5px rgba(0, 0, 0, 0.5);
 }
+
+.recentre {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  z-index: 400;
+  right: 0;
+  bottom: 0;
+}

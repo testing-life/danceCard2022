@@ -1,8 +1,8 @@
 import React, { FC, useEffect, useState } from 'react';
 import 'leaflet/dist/leaflet.css';
-import L, { LatLngLiteral } from 'leaflet';
+import L, { DragEndEvent, LatLngLiteral } from 'leaflet';
 import * as ROUTES from '../../Constants/routes';
-import { TileLayer, useMap, Marker, Popup, Circle } from 'react-leaflet';
+import { TileLayer, useMap, Marker, Popup, Circle, useMapEvents } from 'react-leaflet';
 import { DocumentData } from 'firebase/firestore';
 import { auth } from '../../Firebase/firebase';
 import { useAuthState } from 'react-firebase-hooks/auth';
@@ -35,11 +35,14 @@ export const MapContent: FC<Props> = ({ localUsers, radius }) => {
   const { updateLocation } = useGeo();
 
   useEffect(() => {
-    map.locate({ setView: true, watch: true, enableHighAccuracy: true }).on('locationfound', function (e) {
-      setPosition(e.latlng);
-      updateLocation(e.latlng);
-      map.flyTo(e.latlng, map.getZoom());
-    });
+    if (map) {
+      locateWithTracking();
+      map.on('dragend', ({ distance }: DragEndEvent) => {
+        if (distance > 180) {
+          map.stopLocate();
+        }
+      });
+    }
   }, [map]);
 
   useEffect(() => {
@@ -50,6 +53,14 @@ export const MapContent: FC<Props> = ({ localUsers, radius }) => {
       updateLocation(position);
     }
   }, [position]);
+
+  const locateWithTracking = () => {
+    map.locate({ setView: true, enableHighAccuracy: true }).on('locationfound', function (e) {
+      setPosition(e.latlng);
+      updateLocation(e.latlng);
+      map.flyTo(e.latlng, map.getZoom());
+    });
+  };
 
   const userIcon = L.divIcon({ className: 'my-div-icon', iconSize: [30, 30] });
 
@@ -73,6 +84,14 @@ export const MapContent: FC<Props> = ({ localUsers, radius }) => {
 
   return (
     <>
+      <button
+        className="recentre"
+        onClick={() => {
+          locateWithTracking();
+        }}
+      >
+        Recentre
+      </button>
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
