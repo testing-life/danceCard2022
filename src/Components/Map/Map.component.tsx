@@ -24,12 +24,6 @@ export const LeafletMap: FC<Props> = ({ localUsers, radius }) => {
   const { location, locationError } = useGeo();
   return (
     <>
-      {console.log(
-        'locationError?.message && location.lat && location.lng ',
-        locationError?.message,
-        location.lat,
-        location.lng,
-      )}
       {!locationError?.message && location.lat && location.lng ? (
         <MapContainer
           style={{ width: '100vw', height: '500px' }}

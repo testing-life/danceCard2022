@@ -51,7 +51,7 @@ const ChatsListComponent: FC = () => {
     <>
       <h2>Blocked users</h2>
       <ul>
-        {profile?.blockedUsers.map((item: BlockedUser) => (
+        {profile?.blockedUsers?.map((item: BlockedUser) => (
           <li>
             <p>{item.username}</p>
           </li>

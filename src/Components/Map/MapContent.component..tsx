@@ -40,7 +40,7 @@ export const MapContent: FC<Props> = ({ localUsers, radius }) => {
       map.flyTo(e.latlng, map.getZoom());
     });
     map.on('dragend', ({ distance }: DragEndEvent) => {
-      if (distance > 120) {
+      if (distance > 70) {
         map.stopLocate();
       }
     });
