@@ -37,7 +37,7 @@ export const MapContent: FC<Props> = ({ localUsers, radius }) => {
     map.locate({ watch: true, setView: true, enableHighAccuracy: true }).on('locationfound', function (e) {
       setPosition(e.latlng);
       updateLocation(e.latlng);
-      // map.flyTo(e.latlng, map.getZoom());
+      map.flyTo(e.latlng, map.getZoom());
     });
     map.on('dragend', ({ distance }: DragEndEvent) => {
       if (distance > 120) {
