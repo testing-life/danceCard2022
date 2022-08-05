@@ -2,8 +2,7 @@ import React, { FC, useEffect, useState } from 'react';
 import 'leaflet/dist/leaflet.css';
 import L, { DragEndEvent, LatLngLiteral } from 'leaflet';
 import * as ROUTES from '../../Constants/routes';
-import { TileLayer, useMap, Marker, Popup, Circle, useMapEvents } from 'react-leaflet';
-import { DocumentData } from 'firebase/firestore';
+import { TileLayer, useMap, Marker, Popup, Circle } from 'react-leaflet';
 import { auth } from '../../Firebase/firebase';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { useGeo } from '../../Contexts/geolocation.context';
@@ -11,7 +10,7 @@ import ProfilePopup from '../ProfilePopoup/ProfilePopup.component';
 import { useProfile } from '../../Contexts/profile.context';
 import './Map.component.css';
 import { Link } from 'react-router-dom';
-import { BlockedUser, Profile } from '../../Models/profile.models';
+import { Profile } from '../../Models/profile.models';
 
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 
@@ -35,16 +34,16 @@ export const MapContent: FC<Props> = ({ localUsers, radius }) => {
   const { updateLocation } = useGeo();
 
   useEffect(() => {
-    map.locate({ watch: true, enableHighAccuracy: true }).on('locationfound', function (e) {
+    map.locate({ watch: true, setView: true, enableHighAccuracy: true }).on('locationfound', function (e) {
       setPosition(e.latlng);
       updateLocation(e.latlng);
       // map.flyTo(e.latlng, map.getZoom());
     });
-    // map.on('dragend', ({ distance }: DragEndEvent) => {
-    //   if (distance > 180) {
-    //     map.stopLocate();
-    //   }
-    // });
+    map.on('dragend', ({ distance }: DragEndEvent) => {
+      if (distance > 120) {
+        map.stopLocate();
+      }
+    });
   }, [map]);
 
   useEffect(() => {
@@ -58,6 +57,12 @@ export const MapContent: FC<Props> = ({ localUsers, radius }) => {
 
   const recentre = () => {
     if (position) {
+      map.stopLocate();
+      map.locate({ watch: true, setView: true, enableHighAccuracy: true }).on('locationfound', function (e) {
+        setPosition(e.latlng);
+        updateLocation(e.latlng);
+        map.flyTo(e.latlng, map.getZoom());
+      });
       map.setView(position, 25);
     }
   };

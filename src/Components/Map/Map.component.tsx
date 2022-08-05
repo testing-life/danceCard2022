@@ -24,11 +24,17 @@ export const LeafletMap: FC<Props> = ({ localUsers, radius }) => {
   const { location, locationError } = useGeo();
   return (
     <>
+      {console.log(
+        'locationError?.message && location.lat && location.lng ',
+        locationError?.message,
+        location.lat,
+        location.lng,
+      )}
       {!locationError?.message && location.lat && location.lng ? (
         <MapContainer
-          style={{ width: '500px', height: '500px' }}
+          style={{ width: '100vw', height: '500px' }}
           center={[location.lat, location.lng]}
-          zoom={13}
+          zoom={25}
           scrollWheelZoom={false}
         >
           <TileLayer
