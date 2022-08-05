@@ -35,14 +35,16 @@ export const MapContent: FC<Props> = ({ localUsers, radius }) => {
   const { updateLocation } = useGeo();
 
   useEffect(() => {
-    if (map) {
-      locateWithTracking();
-      map.on('dragend', ({ distance }: DragEndEvent) => {
-        if (distance > 180) {
-          map.stopLocate();
-        }
-      });
-    }
+    map.locate({ watch: true, enableHighAccuracy: true }).on('locationfound', function (e) {
+      setPosition(e.latlng);
+      updateLocation(e.latlng);
+      // map.flyTo(e.latlng, map.getZoom());
+    });
+    // map.on('dragend', ({ distance }: DragEndEvent) => {
+    //   if (distance > 180) {
+    //     map.stopLocate();
+    //   }
+    // });
   }, [map]);
 
   useEffect(() => {
@@ -54,12 +56,10 @@ export const MapContent: FC<Props> = ({ localUsers, radius }) => {
     }
   }, [position]);
 
-  const locateWithTracking = () => {
-    map.locate({ setView: true, enableHighAccuracy: true }).on('locationfound', function (e) {
-      setPosition(e.latlng);
-      updateLocation(e.latlng);
-      map.flyTo(e.latlng, map.getZoom());
-    });
+  const recentre = () => {
+    if (position) {
+      map.setView(position, 25);
+    }
   };
 
   const userIcon = L.divIcon({ className: 'my-div-icon', iconSize: [30, 30] });
@@ -84,12 +84,7 @@ export const MapContent: FC<Props> = ({ localUsers, radius }) => {
 
   return (
     <>
-      <button
-        className="recentre"
-        onClick={() => {
-          locateWithTracking();
-        }}
-      >
+      <button className="recentre" onClick={recentre}>
         Recentre
       </button>
       <TileLayer
