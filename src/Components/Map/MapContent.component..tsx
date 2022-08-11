@@ -1,6 +1,6 @@
 import React, { FC, useEffect, useState } from 'react';
 import 'leaflet/dist/leaflet.css';
-import L, { DragEndEvent, LatLngLiteral } from 'leaflet';
+import L, { LatLngLiteral } from 'leaflet';
 import * as ROUTES from '../../Constants/routes';
 import { TileLayer, useMap, Marker, Popup, Circle } from 'react-leaflet';
 import { auth } from '../../Firebase/firebase';
@@ -39,10 +39,8 @@ export const MapContent: FC<Props> = ({ localUsers, radius }) => {
       updateLocation(e.latlng);
       map.flyTo(e.latlng, map.getZoom());
     });
-    map.on('dragend', ({ distance }: DragEndEvent) => {
-      if (distance > 70) {
+    map.on('dragend', () => {
         map.stopLocate();
-      }
     });
   }, [map]);
 
@@ -63,7 +61,7 @@ export const MapContent: FC<Props> = ({ localUsers, radius }) => {
         updateLocation(e.latlng);
         map.flyTo(e.latlng, map.getZoom());
       });
-      map.setView(position, 25);
+      map.setView(position, map.getZoom());
     }
   };
 
