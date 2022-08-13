@@ -9,6 +9,7 @@ import { Collections } from '../../Constants/collections';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import ErrorMessages from '../../Constants/errors';
 import { Profile } from '../../Models/profile.models';
+import { LocalUsersComponent } from '../LocalUsers/LocalUsers.component';
 
 export const HomeComponent: FunctionComponent<any> = () => {
   const { location, locationError } = useGeo();
@@ -124,8 +125,7 @@ export const HomeComponent: FunctionComponent<any> = () => {
           {ErrorMessages.get(locationError.code)}
         </p>
       )}
-
-      <LeafletMap localUsers={localUsers} radius={radius} />
+      <LocalUsersComponent localUsers={localUsers} radius={radius} />
     </>
   );
 };

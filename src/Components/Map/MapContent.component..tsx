@@ -40,7 +40,7 @@ export const MapContent: FC<Props> = ({ localUsers, radius }) => {
       map.flyTo(e.latlng);
     });
     map.on('dragend', () => {
-        map.stopLocate();
+      map.stopLocate();
     });
   }, [map]);
 
@@ -74,17 +74,6 @@ export const MapContent: FC<Props> = ({ localUsers, radius }) => {
     userToBlockUid: string,
   ) => await toggleUserBlock(direction, blockedById, userToBlockDocId, userToBlockUid);
 
-  const UserLocationMarker = () => {
-    return position === undefined ? null : (
-      <Marker position={position} icon={userIcon}>
-        <Circle center={position} pathOptions={{ fillColor: 'blue' }} radius={radius} />
-        <Popup>
-          You are here. <br />
-        </Popup>
-      </Marker>
-    );
-  };
-
   return (
     <>
       <button className="recentre" onClick={recentre}>
@@ -94,39 +83,36 @@ export const MapContent: FC<Props> = ({ localUsers, radius }) => {
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
-      <UserLocationMarker />
       {profile &&
         localUsers
           ?.filter((otherUser: Profile) => !(profile.blockedBy as string[]).includes(otherUser.uid))
           .map((otherUser: Profile) => {
             return user?.uid !== otherUser.uid && otherUser.active ? (
-              <Marker key={otherUser.uid} position={[otherUser.lat, otherUser.lng]}>
-                <Popup>
-                  <>
-                    {otherUser.username}
-                    <ProfilePopup dances={otherUser.dances} />
-                    {(otherUser.blockedBy as string[]).includes(profile.uid) ? (
-                      <button onClick={() => toggleBlockUser('unblock', profile.uid, otherUser.docId, otherUser.uid)}>
-                        Unblock User
-                      </button>
-                    ) : (
-                      <button onClick={() => toggleBlockUser('block', profile.uid, otherUser.docId, otherUser.uid)}>
-                        Block User
-                      </button>
-                    )}
-                    <Link
-                      to={ROUTES.CHATS}
-                      state={{
-                        targetUserDocID: otherUser.docId,
-                        targetUserID: otherUser.uid,
-                        targetUsername: otherUser.username,
-                      }}
-                    >
-                      Message
-                    </Link>
-                  </>
-                </Popup>
-              </Marker>
+              <div key={otherUser.uid}>
+                <>
+                  {otherUser.username}
+                  <ProfilePopup dances={otherUser.dances} />
+                  {(otherUser.blockedBy as string[]).includes(profile.uid) ? (
+                    <button onClick={() => toggleBlockUser('unblock', profile.uid, otherUser.docId, otherUser.uid)}>
+                      Unblock User
+                    </button>
+                  ) : (
+                    <button onClick={() => toggleBlockUser('block', profile.uid, otherUser.docId, otherUser.uid)}>
+                      Block User
+                    </button>
+                  )}
+                  <Link
+                    to={ROUTES.CHATS}
+                    state={{
+                      targetUserDocID: otherUser.docId,
+                      targetUserID: otherUser.uid,
+                      targetUsername: otherUser.username,
+                    }}
+                  >
+                    Message
+                  </Link>
+                </>
+              </div>
             ) : null;
           })}
     </>
