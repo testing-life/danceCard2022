@@ -41,7 +41,11 @@ export const GeolocationProvider = ({ ...props }: Props) => {
   const updateLocation = (coords: any) => onChange(coords);
 
   useEffect(() => {
-    navigator.geolocation.getCurrentPosition(onChange, onError);
+    let watchId: any = undefined;
+    watchId = navigator.geolocation.watchPosition(onChange, onError, { enableHighAccuracy: true });
+    return () => {
+      navigator.geolocation.clearWatch(watchId);
+    };
   }, []);
 
   return <GeolocationContext.Provider value={{ location, locationError, updateLocation }} {...props} />;

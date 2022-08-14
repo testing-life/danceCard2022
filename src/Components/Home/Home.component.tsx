@@ -2,7 +2,6 @@ import React, { FunctionComponent, useEffect, useState, ChangeEvent } from 'reac
 import { getUsersInRadius, query, collection, db, onSnapshot, auth } from '../../Firebase/firebase';
 
 import { useGeo } from '../../Contexts/geolocation.context';
-import { LeafletMap } from '../Map/Map.component';
 import { useProfile } from '../../Contexts/profile.context';
 import { RADIUS_IN_M } from '../../Constants/locatingParams';
 import { Collections } from '../../Constants/collections';
@@ -14,10 +13,11 @@ import { LocalUsersComponent } from '../LocalUsers/LocalUsers.component';
 export const HomeComponent: FunctionComponent<any> = () => {
   const { location, locationError } = useGeo();
   const [user, loading, authError] = useAuthState(auth);
-  const { profile, updateVisibilityInProfile } = useProfile();
+  const { profile, updateVisibilityInProfile, updateLocationInProfile } = useProfile();
   const [localUsers, setLocalUsers] = useState<Profile[]>([]);
   const [radius, setRadius] = useState(RADIUS_IN_M);
   const [notificationPermission, setNotificationPermission] = useState(false);
+  const [firstLoad, setFirstLoad] = useState(true);
 
   const fetchLocalUsers = async (location: any) => {
     const snapshots = await getUsersInRadius([location.lat, location.lng], radius);
@@ -36,21 +36,28 @@ export const HomeComponent: FunctionComponent<any> = () => {
 
     if (user) {
       const userQuery = query(collection(db, Collections.Users));
-
       unsubscribe = onSnapshot(userQuery, (querySnapshot: any) => {
         const newLocalUsers: any[] = [];
-        querySnapshot.forEach((doc: any) => {
-          newLocalUsers.push(doc.data());
-        });
-        setLocalUsers(newLocalUsers);
+        if (firstLoad) {
+          setFirstLoad(false);
+        } else {
+          querySnapshot.forEach((doc: any) => {
+            if (localUsers.find(item => item.uid === doc.uid)) {
+              newLocalUsers.push(doc.data());
+            }
+          });
+          setLocalUsers(newLocalUsers);
+        }
       });
     }
     return () => unsubscribe;
   }, [user]);
 
   useEffect(() => {
+    console.log('location', location);
     if (Object.keys(location).length) {
       fetchLocalUsers(location);
+      updateLocationInProfile(location);
     }
   }, [location, locationError, radius]);
 
@@ -125,7 +132,11 @@ export const HomeComponent: FunctionComponent<any> = () => {
           {ErrorMessages.get(locationError.code)}
         </p>
       )}
-      <LocalUsersComponent localUsers={localUsers} radius={radius} />
+      {localUsers.length ? (
+        <LocalUsersComponent localUsers={localUsers} radius={radius} />
+      ) : (
+        <p>no users within this range</p>
+      )}
     </>
   );
 };
