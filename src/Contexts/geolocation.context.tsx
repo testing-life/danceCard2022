@@ -7,7 +7,7 @@ export interface HashedLocation extends LatLngLiteral {
 }
 
 type GeolocationConsumer = {
-  location: LatLngLiteral;
+  location: HashedLocation;
   locationError: { message?: string; code?: string };
   updateLocation: (coords: any) => void;
 };

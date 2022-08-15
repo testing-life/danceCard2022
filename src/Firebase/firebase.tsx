@@ -105,7 +105,7 @@ const getUsersInRadius = async (
         const lng = doc.get('lng');
         const distanceInKm = geofire.distanceBetween([lat, lng], location);
         const distanceInM = distanceInKm * 1000;
-        if (distanceInM <= radiusInM) {
+        if (distanceInM <= radiusInM && auth?.currentUser?.uid !== doc.get('uid')) {
           matchingDocs.push(doc);
         }
       }

@@ -15,14 +15,13 @@ import {
 } from '../Firebase/firebase';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { Collections } from '../Constants/collections';
-import * as geofire from 'geofire-common';
-import { LatLngLiteral } from 'leaflet';
+import { HashedLocation } from './geolocation.context';
 
 type ProfileConsumer = {
   profile: Profile | undefined;
   profileError: string;
   updateProfile: (newProfile: Profile) => void;
-  updateLocationInProfile: (newCoords: LatLngLiteral) => void;
+  updateLocationInProfile: (newCoords: HashedLocation) => void;
   updateVisibilityInProfile: (isActive: boolean) => void;
   toggleUserBlock: (
     direction: 'block' | 'unblock',
@@ -85,11 +84,10 @@ export const ProfileProvider = ({ ...props }: Props) => {
     }
   };
 
-  const updateLocationInProfile = async (newCoords: LatLngLiteral): Promise<void> => {
+  const updateLocationInProfile = async (newCoords: HashedLocation): Promise<void> => {
     const userRef = profile && doc(db, Collections.Users, profile.docId);
-    const hash = geofire.geohashForLocation([newCoords.lat, newCoords.lng]);
     if (userRef) {
-      await updateDoc(userRef, { lat: newCoords.lat, lng: newCoords.lng, hash }).catch(e =>
+      await updateDoc(userRef, { lat: newCoords.lat, lng: newCoords.lng, hash: newCoords.hash }).catch(e =>
         setProfileError(e.message),
       );
       // getUserProfile();

@@ -44,14 +44,14 @@ export const MapContent: FC<Props> = ({ localUsers, radius }) => {
     });
   }, [map]);
 
-  useEffect(() => {
-    const updateLocation = (position: LatLngLiteral) => {
-      updateLocationInProfile(position);
-    };
-    if (position && profile) {
-      updateLocation(position);
-    }
-  }, [position]);
+  // useEffect(() => {
+  //   const updateLocation = (position: LatLngLiteral) => {
+  //     updateLocationInProfile(position);
+  //   };
+  //   if (position && profile) {
+  //     updateLocation(position);
+  //   }
+  // }, [position]);
 
   const recentre = () => {
     if (position) {

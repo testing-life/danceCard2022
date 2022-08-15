@@ -13,7 +13,6 @@ const ChatsListComponent: FC = () => {
   // QueryDocumentSnapshot
   const [localChats, setLocalChats] = useState<Message[]>([]);
   const { profile } = useProfile();
-  // const { msg } = useMsgNotification();
   const [isFlashed, setIsFlashed] = useState(false);
   const [deleteError, setDeleteError] = useState('');
   const [blockError, setBlockError] = useState('');

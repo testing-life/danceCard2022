@@ -132,7 +132,7 @@ export const HomeComponent: FunctionComponent<any> = () => {
           {ErrorMessages.get(locationError.code)}
         </p>
       )}
-      {localUsers.length ? (
+      {!!localUsers.length ? (
         <LocalUsersComponent localUsers={localUsers} radius={radius} />
       ) : (
         <p>no users within this range</p>
